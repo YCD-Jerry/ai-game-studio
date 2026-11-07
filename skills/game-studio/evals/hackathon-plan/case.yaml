@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: hackathon-plan
+expected_outcome: |
+  A written plan with roles, an hour-by-hour schedule, one brief per session with owned files, a prep list for the human, scope limits, look review passes against a reference, and a tested public web link before the deadline.

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: story-to-game-chapter
+expected_outcome: |
+  Markdown files: a design doc with a source boundary that excludes the Disney film, a chapter 1 script with a screenshot moment and keyed lines, an overview-sheet prompt and a Tripo-ready turnaround prompt.

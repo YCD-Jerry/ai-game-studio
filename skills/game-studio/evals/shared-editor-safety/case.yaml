@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: shared-editor-safety
+expected_outcome: |
+  A rules document plus scripts in tools/: a guard that refuses while Unity is playing, a lock with owner and staleness, deadlines on lock-holding jobs, staging scripts outside Assets, verifying builds, and commit-by-path.
