@@ -15,7 +15,7 @@ Distilled from *The Yellow Brick Road*, a 3D storybook web game of L. Frank Baum
 | Time | 17 days |
 | Team | 1 human director, ~20 Claude Code sessions (up to ~8 at once), an image AI, Tripo, Blender |
 | Output | 9 chapters, 17 code-generated scenes, ~72k lines of C#, ~40k lines of Blender Python |
-| Process | 1,325 commits, 356 image orders, 256 numbered playtest notes over 13 rounds, a devlog every day |
+| Process | 1,325 commits, 356 image orders, 256 numbered playtest notes over 13 rounds, 16 daily devlog entries |
 
 The interesting part is not the speed but the organisation: a team brief every AI reads first, one owner per file, a single shared editor guarded by a lock, scenes built from code, a numbered playtest backlog in the director's own words, and a rule book that grew out of every expensive mistake.
 
@@ -23,11 +23,12 @@ The interesting part is not the speed but the organisation: a team brief every A
 
 ```
 skills/game-studio/
-├── SKILL.md                    the method in one page: roles, loop, 15 hard rules, reading guide
+├── SKILL.md                    the method in one page: roles, loop, 16 hard rules, reading guide
 ├── references/
 │   ├── studio-roles.md         who does what, file ownership, how orders flow, model tiers
 │   ├── production-loop.md      PRD → chapter → graybox → look passes → playtest loop → overnight runs
 │   ├── quality-bar.md          12 principles, checklists marked [data]/[image]/[play], when to stop
+│   ├── layout-and-ui.md        the director's eye for alignment, and a drag-and-drop layout tool
 │   ├── art-pipeline.md         overview sheets, asset breakdown, screenshot-first image orders, reviews
 │   ├── characters.md           turnaround → Tripo → six-angle check → rig → Mixamo → a normal walk
 │   ├── props-and-buildings.md  Blender from code, in parts, QA gates, Blender↔Unity traps
@@ -37,12 +38,14 @@ skills/game-studio/
 │   ├── hackathon.md            one scene in a day with three sessions
 │   ├── shipping.md             web build, the 60-second video, launch, opening the source safely
 │   └── case-study.md           the project in numbers, what worked, what slowed it down
-├── templates/                  CLAUDE.md, TEAM.md, PRD, chapter, brief, backlog, morning report,
-│                               night plan, devlog, recovery, art board, 11 image/review prompts
+├── templates/                  kickoff messages, CLAUDE.md, TEAM.md, PRD, chapter, brief, backlog,
+│                               morning report, night plan, devlog, recovery, art board, 11 prompts
 ├── assets/unity/               C# starting points (compile against Unity 6):
 │                               scene builder, story director, TSV localization, interact key,
-│                               grip socket, runtime NavMesh, review shots, editor state beacon
-└── scripts/                    guard, lock, play-state probe, hand back, a full editor round
+│                               grip socket, runtime NavMesh, review shots, editor state beacon, web build
+└── scripts/                    guard, lock, play-state probe, hand back, a full editor round,
+                                a dialog watcher, and a Claude Code hook that blocks writes into
+                                Assets/ while Unity is playing
 ```
 
 ## Install
@@ -73,12 +76,15 @@ Just describe the game. The skill triggers on requests like:
 - "We have a hackathon tomorrow, 8 hours, I want a beautiful 3D scene people can play."
 - "Two sessions keep breaking each other's compiles in the same Unity project."
 
-Then start with `SKILL.md` → "Start a project", or `references/hackathon.md` for a one-day build.
+Then start with `SKILL.md` → "Start a project" and the kickoff messages in `templates/kickoff.md`, or `references/hackathon.md` for a one-day build.
 
 ## What you need
 
 - Claude Code, ideally several sessions (the desktop app or terminals).
-- Unity 6 with Web Build Support, driven by a CLI or MCP your sessions can call.
+- Unity 6 with Web Build Support, driven by the Unity CLI (`unity command ...`) or an MCP bridge your sessions can call. Without a CLI, the guard runs in beacon mode (see `references/editor-safety.md`).
+- Python 3 for the write-blocking hook (optional but recommended).
+
+Note: `scripts/round.ps1` starts `dialog_watch.ps1` in the background, which clicks "Try Again" on Unity's "Opening file failed" dialog; pass `-NoDialogWatch` if you don't want that.
 - Blender 4+ (headless scripts).
 - An image model (e.g. GPT image in the Codex app) and an AI-3D tool (e.g. Tripo) with an account you control. Claude never logs in or pays; you do.
 

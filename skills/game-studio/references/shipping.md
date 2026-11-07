@@ -11,7 +11,7 @@ Read this when building for the web, deploying, making the launch video, opening
 
 ## 1. Web build and hosting
 
-- Build with the "Build/Web" menu (`references/unity-architecture.md` §10): WebGPU first with WebGL2 fallback, Brotli with decompression fallback, a size report beside the build.
+- Build with `assets/unity/Editor/WebBuild.cs` (menu `Game/Build/Web Player`, see `references/unity-architecture.md` §10): WebGPU first with WebGL2 fallback, Brotli with decompression fallback, a size report beside the build.
 - Never run a full web build on the shared editor while sessions work or the director plays; it holds the editor 10–30 minutes. Use a scheduled slot or a second project copy.
 - Hosting, easiest first:
   - **itch.io**: upload the build folder as a zip, "playable in browser"; handles large builds; good for players and game communities.
@@ -21,7 +21,7 @@ Read this when building for the web, deploying, making the launch video, opening
 
 ## 2. Before you share the link
 
-- [ ] Opens in a private window on a second machine; first picture within seconds, a progress indicator otherwise.
+- [ ] **The page is published** (an itch.io draft or restricted page is invisible to judges and players: make it public, or restricted with the access link handed in), then opened logged-out in a private window on a second machine; first picture within seconds, a progress indicator otherwise.
 - [ ] Controls on screen the first time they matter (movement, look, interact).
 - [ ] Every chapter reachable from the menu; nothing stuck behind a dev key.
 - [ ] No `#missing_key` text, no placeholder boxes, no console errors in the browser.

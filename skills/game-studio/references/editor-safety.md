@@ -39,16 +39,20 @@ The answer is four mechanisms: **a guard, a lock, a fixed round shape with a dea
 | `scripts/refresh.cs` | `AssetDatabase.Refresh()` with a Play check |
 | `scripts/review_shots.cs` | Spec-driven edit-mode shots (named cameras or `shot=` lines in `Temp/game-studio/review_shots.txt`), small batches, a flat/cyan sanity check per image |
 | `scripts/dialog_watch.ps1` | Background watcher: clicks "Try Again" on "Opening file failed", closes a stray "Save Scene" dialog (cancel), lists Unity's windows when diagnosing a freeze |
-| `assets/unity/Editor/EditorStateBeacon.cs` | In-project: writes `Temp/editor_state.txt` every 2 s for tools without a CLI, and **pauses auto-refresh while playing**, so files that land in `Assets/` mid-Play wait until Play ends |
+| `assets/unity/Editor/EditorStateBeacon.cs` | In-project: writes `Temp/editor_state.txt` every 2 s (read by the guard in beacon mode and by the hook), and **pauses auto-refresh while playing**, so files that land in `Assets/` mid-Play wait until Play ends |
+| `scripts/hooks/block_assets_while_playing.py` + `settings.example.json` | A Claude Code PreToolUse hook that refuses any write into `Assets/` while the beacon says Play; a permission allow-list for the guard, lock and CLI so sessions aren't stopped by prompts |
 
 ## 3. Setup
 
-1. Environment for every session: `UNITY_PROJECT_PATH=<project root>`, `GAME_STUDIO_SESSION=<one ASCII token, e.g. ch3>`. Optional: `GAME_STUDIO_LOCK_DIR` (default `<project>/.game-studio/locks`, on a local disk), `GAME_STUDIO_EVAL_DIR` (where `playing.cs` etc. live; it must be readable by the Unity process, not a sandboxed temp folder), `UNITY_CLI`.
+0. **How sessions reach the editor.** The scripts assume a command-line bridge into the running editor: the Unity CLI (`unity`) plus its editor package in the project, which lets a shell run `unity command <group> <cmd>` (run a C# snippet, recompile, invoke a menu item, read the console) against the open editor. An MCP bridge to the editor does the same jobs from inside Claude; then run the guard in **beacon mode** (`GAME_STUDIO_PLAY_PROBE=beacon`), which needs no CLI at all. Check your command names once (`unity command --help`); they changed between versions, so set `GAME_STUDIO_EVAL_CMD` if yours isn't `command script eval_file`.
+1. Copy `scripts/` into the project as `tools/game-studio/` (outside `Assets/`). Environment for every session: `UNITY_PROJECT_PATH=<project root>`, `GAME_STUDIO_SESSION=<one ASCII token, e.g. ch3>`. Optional: `GAME_STUDIO_LOCK_DIR` (default `<project>/.game-studio/locks`, on a local disk), `GAME_STUDIO_EVAL_DIR` (where `playing.cs` etc. live; it must be readable by the Unity process, not a sandboxed temp folder), `UNITY_CLI`, `GAME_STUDIO_PLAY_PROBE` (`cli` or `beacon`), `GAME_STUDIO_EVAL_CMD`.
+   On Windows, run the `.ps1` scripts as `powershell -NoProfile -ExecutionPolicy Bypass -File ...` (process scope only; it changes no system setting), or use the bash twins from Git Bash.
 2. Add `.game-studio/locks/` to `.gitignore`; commit `.game-studio/hand_back.txt` naming the light scene.
 3. Copy `EditorStateBeacon.cs` into an Editor folder.
 4. In Unity's preferences, set script changes while playing to "recompile after finished playing".
 5. Decide who may start the editor (one cheap custodian session). Everyone else reports a closed editor instead of opening their own. On "restore scene backup?", choose don't restore: scenes are generated from code.
-6. Discover your CLI's command names once (`unity command --query eval`): group names vary between versions of the editor bridge package (`script eval_file` vs `eval_file`).
+6. Install the hard stop and the allow-list: merge `scripts/hooks/settings.example.json` into `.claude/settings.json` (adjust the paths) and restart the sessions. Now even a session that forgot every rule cannot write into `Assets/` while the director plays.
+7. The custodian opens the editor (`unity open <project>` or the Hub) once, waits for the import to finish, and opens the light scene.
 
 ## 4. The guard and its exit codes
 
@@ -62,7 +66,7 @@ scripts/guard.sh ch3 || exit
 | Code | Meaning | Do |
 |---|---|---|
 | 0 | Not playing, no import running, editor lock free or yours | Proceed |
-| 3 | Play mode or entering it: the director is playtesting | Do other work; come back later. Stop Play yourself only if a rebuild is needed now, and say so |
+| 3 | Play mode or entering it: the director is playtesting | Do other work; come back later. Never stop the director's Play yourself; if a rebuild is urgent, ask them |
 | 4 | State unknown: editor closed, CLI failed, eval timed out, modal dialog | Look before retrying (§8) |
 | 5 | Import lock younger than 30 min: a global import is running | Wait |
 | 6 | Another owner's editor lock younger than 20 min | Wait your turn |
@@ -89,8 +93,7 @@ Run it before every recompile, rebuild, reimport, `AssetDatabase.Refresh`, and *
 ```
 wait for the lock (bounded, holding nothing) → take it, read it back
 deadline = now + 25 min; start dialog_watch
-[optional] hand back first, to start from a known state
-bring in: refresh lock → guard → copy only changed files (retry 6×) → mirror deletes with .meta
+bring in: refresh lock → guard → copy only changed files (top level of -StageDir only; retry 6×) → mirror deletes with .meta
 refresh → settle: compiling=False and updating=False three polls in a row
 compile failed? → list `error CS` from the console → STOP (never rebuild on old code)
 build: refresh lock → guard → t = now → invoke the builder menu → settle
@@ -110,7 +113,7 @@ Rules around it:
 ## 7. Writing evals that clean up after themselves
 
 - An eval file is a C# statement body ending in `return "<string>";`, kept **outside** `Assets/`. No arguments: parameters go in a side file the eval reads. Fully qualify names.
-- Any eval that changes something starts with `if (UnityEditor.EditorApplication.isPlaying) return "skipped: playing";`.
+- Any eval that changes something starts with `if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) return "skipped: playing";` (this also catches the moment Play is starting).
 - Objects it creates are `HideAndDontSave` and destroyed in `finally`. Globals, editor settings (`ShaderUtil.allowAsyncCompilation`), skinning flags and bone poses are restored in `finally`. Report "dirty before / after".
 - Check the active scene inside the eval: another session's hand-back may have switched it.
 - Shots: async shader compilation off (flat cyan = still compiling); `forceMatrixRecalculationPerRender` on skinned meshes; sample Animators (`Rebind(); Update(t)`) or people stand in T-pose; one reused RenderTexture; wait for the GPU with a one-pixel `ReadPixels` (a looped `AsyncGPUReadback` crashed the editor); a few images per eval. Log a measured number beside each picture.

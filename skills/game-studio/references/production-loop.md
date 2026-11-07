@@ -78,7 +78,7 @@ The director can leave the team working while asleep. Leave (`templates/night-pl
 3. Standing limits restated: no Play mode; guard before compile/rebuild/import; one editor via the lock; shared files only with the commander's say-so; no long exclusive jobs (a 15-minute web build) that block the shared editor; commit and push every step.
 4. Logins done and the spending stance stated.
 
-During the night: the commander checks on a timer (every 30–60 min; timers are session-scoped, so recreate them after a restart); when work runs out, start the next useful thing. **Never wait for an answer**: take the most reasonable default, write it in `morning-questions.md` with the cost to change it, and continue. Expect quota stops; if every step was committed and plans live in files, nothing is lost.
+During the night: the commander checks on a timer (every 30–60 min, e.g. Claude Code's `/loop` or a scheduled task; both belong to the session, so recreate them after a restart); when work runs out, start the next useful thing. **Never wait for an answer**: take the most reasonable default, write it in `morning-questions.md` with the cost to change it, and continue. Expect quota stops; if every step was committed and plans live in files, nothing is lost.
 
 In the morning: a report (done table with commits, "not verified: play these, here's where", decisions needed with a recommendation, incidents), the questions file, the devlog, and updated backlog statuses.
 

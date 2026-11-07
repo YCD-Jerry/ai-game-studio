@@ -7,8 +7,8 @@
 - `docs/PRD.md`, `docs/chapters/`, `docs/QUALITY_BAR.md`, `SourceArt/STYLE_GUIDE.md`, `SourceArt/ART_QUEUE.md`.
 
 ## Where things are
-- Scenes are generated from code; never hand-edit `.unity` files. Builders: `Assets/_Project/Scripts/Editor/<Name>Builder.cs` → menu `<Project>/Build/<Scene>`.
-- Player-facing text: `Assets/_Project/Localization/Source/*.tsv` (key, <lang1>, <lang2>); import with `<Project>/Setup/Import Localization`. Never hard-code text.
+- Scenes are generated from code; never hand-edit `.unity` files. Builders: `Assets/Game/Scripts/Editor/<Name>Builder.cs` → menu `<Project>/Build/<Scene>`.
+- Player-facing text: `Assets/Game/Localization/Source/*.tsv` (key, <lang1>, <lang2>); import with `<Project>/Setup/Import Localization`. Never hard-code text.
 - Blender build scripts: `SourceArt/blender/build/*.py`, run headless: `blender -b --factory-startup --python <script> -- --root <project path>`.
 - Editor helper scripts (guard, lock, hand back, shots): `<tools dir>` (outside `Assets/`).
 
@@ -21,7 +21,7 @@
 - **Check imported models' real size in the scene.**
 - **Prefer ready-made assets** (CC0 packs) before modelling or generating; record sources in the art folder.
 - **Characters come from AI 3D** (turnaround → Tripo); buildings and fine props from the modelling session in Blender.
-- **Interact key is always <F>**, in code, prompts and docs.
+- **Interact key is always <KEY>**, in code, prompts and docs.
 - **Work continuously**: review → integrate → check → commit → next. Stop only for purchases, logins, paid generations, or creative calls with no sensible default; otherwise pick a default, log it for the director, keep going.
 - **Three tries without improvement: stop**, report numbers to the commander, change approach.
 

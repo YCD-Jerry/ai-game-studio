@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unity command:*)",
+      "Bash(bash tools/game-studio/guard.sh:*)",
+      "Bash(bash tools/game-studio/lock.sh:*)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File tools/game-studio/guard.ps1:*)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File tools/game-studio/lock.ps1:*)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File tools/game-studio/round.ps1:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/game-studio/hooks/block_assets_while_playing.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

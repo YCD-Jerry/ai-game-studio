@@ -72,6 +72,19 @@ if ($ed -and $ed.AgeMin -lt $EditorStaleMin -and -not ($Owner -and $ed.Owner -eq
     exit 6
 }
 
+# 3a. Beacon mode (GAME_STUDIO_PLAY_PROBE=beacon): no CLI needed. EditorStateBeacon.cs (in an Editor folder of the
+#     project) rewrites <project>\Temp\editor_state.txt every 2 s. Older than 10 s = editor closed, busy or behind a dialog.
+if ($env:GAME_STUDIO_PLAY_PROBE -eq 'beacon') {
+    $state = Join-Path $ProjectPath 'Temp\editor_state.txt'
+    if (-not (Test-Path -LiteralPath $state)) { Write-Output "guard: no $state (beacon not installed or editor closed)"; exit 4 }
+    $ageSec = ((Get-Date) - (Get-Item -LiteralPath $state).LastWriteTime).TotalSeconds
+    if ($ageSec -gt 10) { Write-Output ("editor state is " + [int]$ageSec + " s old (closed, busy or a modal dialog) - not touching it"); exit 4 }
+    $s = [IO.File]::ReadAllText($state)
+    if ($s -match 'playing=True|willPlay=True') { Write-Output "UNITY IS IN PLAY MODE - not touching it"; exit 3 }
+    if ($s -notmatch 'playing=False') { Write-Output "guard: unreadable beacon state - not touching it"; exit 4 }
+    exit 0
+}
+
 # 3. play state (exit 3 / 4), with a hard time limit so a frozen editor cannot hang the caller.
 $unity = $env:UNITY_CLI
 if (-not $unity) {
@@ -84,7 +97,8 @@ if (-not (Test-Path -LiteralPath $probe)) { Write-Output "guard: missing $probe"
 
 $psi = New-Object System.Diagnostics.ProcessStartInfo
 $psi.FileName = $unity
-$psi.Arguments = 'command script eval_file --file "' + $probe + '" --timeout ' + $EvalTimeoutSec
+$evalCmd = $env:GAME_STUDIO_EVAL_CMD; if (-not $evalCmd) { $evalCmd = 'command script eval_file' }   # differs between CLI versions: check `unity command --help`
+$psi.Arguments = $evalCmd + ' --file "' + $probe + '" --timeout ' + $EvalTimeoutSec
 $psi.UseShellExecute = $false
 $psi.RedirectStandardOutput = $true
 $psi.RedirectStandardError = $true

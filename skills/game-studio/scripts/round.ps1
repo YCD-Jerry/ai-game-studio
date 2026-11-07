@@ -10,12 +10,12 @@ writes into Assets/ a fresh guard (exit 3 = the human started playing: stop, do 
 
 Examples
   # rebuild a generated scene and shoot it
-  .\round.ps1 -Owner ch3 -Note "ch3 bridge" -BuildMenu "Tools/Build/Chapter 3" `
-              -BuiltMarker '\[Build\] Built Assets/Scenes/Ch3' -BuiltScene Assets/Scenes/Ch3.unity -ShotSpec D:\wip\ch3\shots.txt
+  .\round.ps1 -Owner ch3 -Note "ch3 bridge" -BuildMenu "Game/Build/Level 01" `
+              -BuiltMarker '\[Game\] Built Assets/Game/Scenes/Level01' -BuiltScene Assets/Game/Scenes/Level01.unity -ShotSpec <stage dir>\ch3\shots.txt
   # bring a delivered model in from a staging folder, no rebuild, just shots
-  .\round.ps1 -Owner modeling -StageDir D:\wip\dais\deliver -AssetsDest Assets/Art/Castle -ShotSpec D:\wip\dais\shots.txt
+  .\round.ps1 -Owner modeling -StageDir <stage dir>\dais\deliver -AssetsDest Assets/Art/Castle -ShotSpec <stage dir>\dais\shots.txt
   # code change staged outside Assets (several files that reference each other move in together)
-  .\round.ps1 -Owner ui -StageDir D:\wip\ui\Scripts -AssetsDest Assets/Scripts/UI -Recompile
+  .\round.ps1 -Owner ui -StageDir <stage dir>\ui\Scripts -AssetsDest Assets/Scripts/UI -Recompile
 
 Parameters
   -Owner        session name, one token (GAME_STUDIO_SESSION)
@@ -116,10 +116,11 @@ function Eval([string]$file, [int]$sec = 300) {
 function Short([string]$s, [int]$n = 400) { $t = ($s -replace '\s+', ' ').Trim(); if ($t.Length -gt $n) { $t.Substring(0, $n) + '...' } else { $t } }
 function Guard { $null = & (Join-Path $PSScriptRoot 'guard.ps1') -Owner $Owner -ProjectPath $ProjectPath -LockDir $LockDir -EvalDir $EvalDir; return $LASTEXITCODE }
 $script:deadline = $null
+$script:lost = $false   # set when someone else took the lock: then the editor is theirs, do not hand it back
 function Step([string]$name) {
     if ((Get-Date) -gt $script:deadline) { throw "DEADLINE before '$name'" }
     $null = & (Join-Path $PSScriptRoot 'lock.ps1') -Action refresh -Owner $Owner -Note "$Note : $name" -ProjectPath $ProjectPath -LockDir $LockDir
-    if ($LASTEXITCODE -ne 0) { throw "LOST LOCK before '$name'" }
+    if ($LASTEXITCODE -ne 0) { $script:lost = $true; throw "LOST LOCK before '$name'" }
     Say "== $name"
 }
 function SecondsLeft { [int][math]::Max(30, ($script:deadline - (Get-Date)).TotalSeconds) }
@@ -255,7 +256,8 @@ catch {
 }
 finally {
     # ---- 6. hand back (save + light scene), release, stop the watcher. Always, even after a failure or deadline.
-    if (-not $NoHandBack) {
+    if ($script:lost) { Say "lock lost: NOT handing back (another session holds the editor now; touching it would break their round)" }
+    elseif (-not $NoHandBack) {
         $hb = Eval 'hand_back.cs' 300
         Say ("hand back: " + (Short $hb 300))
         if ($hb -notmatch '\bOK\b') { Say "WARNING: hand-back did not report OK: look at the editor (Untitled scene? modal dialog? dialog_watch.ps1 -Mode List)" }

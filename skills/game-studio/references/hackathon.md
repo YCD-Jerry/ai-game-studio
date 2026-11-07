@@ -23,9 +23,13 @@ The full studio method is built for weeks. A hackathon gives you 6–24 hours. T
 | Human (director) | Theme, story choice, taste calls, all playtesting, Tripo/Mixamo clicks, recording the video | Write code |
 | Commander session | One-page PRD, art orders, asset breakdown, reviews of every image and screenshot, the cut list, README | Hands-on building |
 | Session A: world | Scene builder, terrain/ground, lighting and post, environment assets, web build | Character code |
-| Session B: character and story | Player controller + camera, character import and gait, the one interaction, the short story beat, title and end card | Scene builder |
+| Session B: character and story | Player controller + camera, character import and gait, the one interaction (one interact key, e.g. F), the short story beat, title and end card | Scene builder |
 
-Three sessions is the sweet spot for a day: enough parallelism, few enough that file ownership stays obvious. Give each worker a written brief (`templates/brief.md`) with its files listed; two sessions never edit the same file.
+Three sessions is the sweet spot for a day: enough parallelism, few enough that file ownership stays obvious. Give each worker a written brief (`templates/brief.md`) with its files listed; two sessions never edit the same file. Start every session with the kickoff messages in `templates/kickoff.md`.
+
+Write a one-page **interface contract** in the first half hour (`docs/CONTRACT.md`): the names of scene anchors, the events one session raises and another listens to, the string keys, the layer names. Then A and B can build against each other without waiting.
+
+**Never wait on a paid or external step.** The character session wires a stand-in humanoid (a Mixamo X Bot, or a capsule with the same animator) first; the AI-3D model only swaps the skin when it arrives. If it isn't in by the half-way mark, ship the stand-in, styled well.
 
 ## 3. The 8-hour plan
 
@@ -37,6 +41,8 @@ Three sessions is the sweet spot for a day: enough parallelism, few enough that 
 | 4:30–6:00 | Turns feedback into items; decides what to cut | Look pass 2; fixes from feedback | Title screen, end card, fixes | Second playtest |
 | 6:00–7:00 | README (what, how to play, how it was made, one screenshot), submission text | Web build (WebGPU with WebGL2 fallback), upload to itch.io or Pages, test the link on another machine | Freeze: only bug fixes | Records a 60 s video (`references/shipping.md` §3) |
 | 7:00–8:00 | Buffer. Something always breaks at the end. | Rebuild if needed | — | Submits |
+
+Freeze features at about three-quarters of the time; after that only fixes, the build and the video. Prepare a 60-second pitch and two fallback story ideas the night before.
 
 For 24 hours: keep the same order, give the look passes and playtests more rounds, and add one more scene only after the first one passes the screenshot test.
 
@@ -53,7 +59,7 @@ Never cut:
 
 ## 5. Submission checklist
 
-- [ ] Play link opens in a fresh browser (Chrome/Edge for WebGPU; WebGL2 fallback works).
+- [ ] The page is **published**, not a draft, and the link opens logged-out in a private window on another machine (Chrome/Edge for WebGPU; the WebGL2 fallback starts).
 - [ ] Controls on screen (WASD / mouse / F).
 - [ ] 60 s video, first frame already beautiful, captions readable.
 - [ ] README: one line pitch, screenshot, how to play, "Built by one human directing N Claude Code sessions with the game-studio skill", what was pre-existing.

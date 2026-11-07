@@ -114,7 +114,10 @@ while ((Get-Date) -lt $until) {
             Start-Sleep -Seconds 2
             $chk = Read-Lock
             if ($chk -and $chk.Owner -eq $Owner) { Write-Output ("taken $Name.lock " + (Get-Date -Format s)); exit 0 }
-        } elseif ("$msg" -ne $last) { $last = "$msg"; Write-Output ("waiting: guard " + $g + " " + $msg) }
+        } else {
+            if ("$msg" -ne $last) { $last = "$msg"; Write-Output ("waiting: guard " + $g + " " + $msg) }
+            Start-Sleep -Seconds 12   # the guard asks the editor; while the human plays, don't ask every 3 s
+        }
     } elseif ($l.Text -ne $last) { $last = $l.Text; Write-Output ("waiting: " + $l.Text) }
     Start-Sleep -Seconds 3
 }

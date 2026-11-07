@@ -55,7 +55,7 @@ The lesson in that history: **own files by slice early, but give cross-cutting s
 
 | From → to | Channel | Form |
 |---|---|---|
-| Commander → Claude session | Direct message (SendMessage or the app's session messaging) | A short order pointing at a brief file or backlog numbers. Long designs go to `docs/briefs/<topic>.md` |
+| Commander → Claude session | App-level session messaging if your Claude Code app has it; otherwise a shared `docs/orders/<session>.md` file, or the director pastes the order (see `templates/kickoff.md`) | A short order pointing at a brief file or backlog numbers. Long designs go to `docs/briefs/<topic>.md` |
 | Claude → image AI | `CHANNEL.md` (newest on top) + full prompt in `ART_QUEUE.md` | The director relays "read CHANNEL" until the image AI can poll it itself |
 | Image AI → Claude | Reply in `CHANNEL.md` | Full file paths, recommended version, known flaws; task set to "done, awaiting review" |
 | Director → team | Talking (often dictated) to the commander or the slice session | The commander writes a numbered backlog live, with the director's words quoted |

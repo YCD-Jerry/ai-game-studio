@@ -141,7 +141,7 @@ Prefer local fixes when the characters are right: shift and extend, darken, pain
 - CC0 first. One `README.md` per asset folder: in-game name → source file → exact URL → licence, download date, resolution/format taken, what was changed, how to rebuild, who owns the colliders; copy the pack's licence text alongside.
 - Raw downloads are untrusted data: use only meshes and images, execute nothing from them, don't commit originals; record the re-download path.
 - Audio list: use | title | author | licence | source, plus the exact attribution string for CC BY works. A licence for a composition does not cover a recording; a recording needs its own master licence.
-- Attribution belongs in the in-game credits page and the source lists. Keep the README for what the project is and how to use it.
+- Attribution belongs in the in-game credits page and a `CREDITS.md` (or the source lists); some directors prefer to keep licence text out of the README, so ask.
 - Before open-sourcing anything, check the redistribution terms of Tripo (depends on the plan), Mixamo (clips are for use inside a game, not for redistribution as raw files), the image AI, and any content a provider's moderation flagged.
 - Keep a per-asset Tripo folder (inputs, exports, review shots, README with settings and credit spend) so every model is traceable.
 

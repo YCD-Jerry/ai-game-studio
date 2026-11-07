@@ -54,7 +54,7 @@ An overview reference image · one shot the player remembers · a moment where t
 
 **F. Text and layout** — layout check script over every UI [data]; text-fit audit for every string in every language against every box it can appear in (one audit: 5,204 pairs, 244 problems → 0) [data]; wrap or page instead of shrinking [image]; scrims behind text over pictures [image]; every player-facing string in the tables [data].
 
-**G. UI and feel** — notifications on top and queued [image]; an objective hint is always available [play]; hold-to-interact feedback starts at once [image]; consistent default keys, one interact key [data]; simple menus aligned to one grid [image].
+**G. UI and feel** — notifications on top and queued [image]; an objective hint is always available [play]; hold-to-interact feedback starts at once [image]; consistent default keys, one interact key [data]; simple menus aligned to one grid [image]; layouts pass the checklist in `references/layout-and-ui.md` §4 at every screen shape and in every language [data/image]; the director's saved layout and text untouched [data].
 
 **H. Flow stability** — 0 compile errors, no new console errors [data]; every entry path works: from the map, from the previous chapter, first time, from a save, skip, autoplay, after pause [data/play]; coroutine handles never used across a yield after release [data]; no softlocks [play]; companions present at chapter start [data]; anything integrated over deltaTime tested with variable frame times (0.008–0.25 s plus jitter) [data].
 

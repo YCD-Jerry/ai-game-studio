@@ -1,6 +1,6 @@
 ---
 name: game-studio
-description: Run a studio of Claude Code sessions that builds a 3D game for the web — one human director, a commander session, worker sessions that own files, an image AI for concept art, Tripo (or another AI-3D tool) for characters, Blender scripts for buildings, Unity URP with WebGPU. Covers team setup (TEAM.md, CLAUDE.md, briefs, file ownership), scenes generated from code, story directors, the art pipeline (overview sheets, screenshot-first image orders, turnarounds, six-angle model checks, Mixamo), three-camera look passes, playtest feedback loops, overnight runs, safety rails for a shared Unity editor (play-mode guard, editor lock, staged scripts), a quality bar, a one-day hackathon plan, and shipping (web build, 60-second video, open-sourcing safely). Use whenever someone wants to make a 3D, story, exploration or web game with AI, turn a book or story into a playable world, coordinate several Claude sessions on one game, set up Unity/Blender/Tripo/GPT-image pipelines, plan a game jam or hackathon build, or fix multi-agent problems like broken compiles, lost deliveries or a frozen editor — even if they never say "studio".
+description: Run a team of Claude Code sessions that builds a 3D Unity game for the web (URP, WebGPU): one human director, a commander session, worker sessions that each own files, an image AI for concept art, Tripo for characters, Blender scripts for buildings. Covers team setup (TEAM.md, CLAUDE.md, briefs), scenes generated from code, story directors, the art pipeline (overview sheets, turnarounds, Mixamo), look passes against references, playtest feedback loops, overnight runs, safety rails for a shared Unity editor, a quality bar, a one-day hackathon plan, and shipping. Use when someone wants to build a 3D story or exploration game with several Claude sessions or with Tripo/Blender/Unity, turn a book into a playable 3D world, plan a game jam build in Unity, or fix multi-session problems such as broken compiles, lost deliveries or a frozen Unity editor.
 license: MIT
 ---
 
@@ -24,12 +24,12 @@ Distilled from *The Yellow Brick Road*: a 3D storybook web game of the 1900 *Wiz
 
 ## Start a project
 
-1. **Ask the director only what has no sensible default**: the story or source, the feel in a sentence, the platform, languages, the interact key. Default the rest and say so.
+1. **Ask the director only what has no sensible default**: the story or source, the feel in a sentence, the platform, languages, the interact key (default F). Default the rest and say so.
 2. **Write the PRD** from `templates/PRD.md` (the "Lite" part first). Include a source boundary: what may and may not be used (a public-domain book may have a famous copyrighted adaptation whose inventions are off-limits).
 3. **Set up the repo**: GitHub from hour one, push after every commit. Unity 6 URP project with WebGPU + WebGL2 web target; assembly definitions for Core/Gameplay/Narrative/Editor; copy `assets/unity/` and rename the namespaces. Copy `templates/CLAUDE.md`, `templates/TEAM.md`, `templates/RECOVERY.md` into place and fill them in.
 4. **Install the safety rails** (`references/editor-safety.md`): `EditorStateBeacon.cs` in an Editor folder, `scripts/` into a tools folder outside `Assets/`, a lock folder all sessions share.
 5. **Pick the style**: the same three scenes in two candidate styles from the image AI; the director picks; write the style and character blocks into `STYLE_GUIDE.md` (`templates/art-board.md`, `templates/prompts.md`).
-6. **Plan the team** (`references/studio-roles.md`): a commander on the strongest model; one high-effort session per chapter or per system; an art pipeline session; a cheap editor custodian. Write each one a brief (`templates/brief.md`) that lists the files it owns.
+6. **Plan the team** (`references/studio-roles.md`): a commander on the strongest model; one high-effort session per chapter or per system; an art pipeline session; a cheap editor custodian. Write each one a brief (`templates/brief.md`) that lists the files it owns, and start each with its kickoff message (`templates/kickoff.md`).
 7. **First chapter** through the production loop below. Write a devlog entry every day (`templates/devlog.md`).
 
 ## The production loop (per chapter)
@@ -63,6 +63,7 @@ Details: `references/production-loop.md`, `references/art-pipeline.md`, `referen
 13. **Three tries without measured improvement: stop**, keep the last good version, report numbers, change approach. And confirm the direction before polishing details.
 14. **Report only from evidence, and say what is unverified.** "Done" means built and checked; only the director's play makes it "verified". A complaint the director makes twice is the team's failure: find the root cause and fix it game-wide.
 15. **Anything needing an account, payment, credits or accepting terms goes to the director.** Never type passwords; log every paid generation.
+16. **What the director edits directly is theirs.** Give them local tools for the things taste decides (story text in the string tables, screen layouts in a layout JSON) and never overwrite their saves. Layouts follow shared columns, mirrored rows, one axis per text column and hierarchy by size (`references/layout-and-ui.md`).
 
 The full set with incidents: `references/pitfalls.md` (30 lessons) and `references/editor-safety.md`.
 
@@ -80,6 +81,7 @@ The full set with incidents: `references/pitfalls.md` (30 lessons) and `referenc
 | Setting up roles, adding a session, writing a brief | `references/studio-roles.md` |
 | Planning a chapter, running look passes, handling feedback, leaving work overnight | `references/production-loop.md` |
 | About to deliver anything | `references/quality-bar.md` |
+| Laying out a menu, map, title page or HUD; building a layout tool | `references/layout-and-ui.md` |
 | Ordering or reviewing images, deciding who makes an asset | `references/art-pipeline.md`, `templates/prompts.md` |
 | Making a character, importing animations, judging a walk | `references/characters.md` |
 | Modelling a building or prop, accepting a model | `references/props-and-buildings.md` |
@@ -92,8 +94,8 @@ The full set with incidents: `references/pitfalls.md` (30 lessons) and `referenc
 
 ## Bundled files
 
-- `templates/`: `CLAUDE.md`, `TEAM.md`, `PRD.md`, `chapter.md`, `brief.md`, `backlog.md`, `morning-report.md`, `night-plan.md`, `devlog.md`, `RECOVERY.md`, `art-board.md` (style guide, task board, channel), `prompts.md` (11 image and review prompts).
-- `assets/unity/Runtime/`: `StoryDirectorBase` (Conversation / Monologue / Musing, camera never taken), `Loc` + `LocText` (TSV string tables), `InteractPoint` + `PlayerInteractor` (one rebindable key, press and hold), `GripSocket` (props keep real size in scaled rigs), `RuntimeNavMeshBaker`. `assets/unity/Editor/`: `Level01Builder` (scene-from-code template), `ReviewShots` (edit-mode review cameras), `EditorStateBeacon` (state file for the guard; pauses imports during Play). `assets/unity/Examples/Level01Director.cs`. They compile against Unity 6; treat them as starting points.
-- `scripts/`: `guard` (PowerShell and bash), `lock`, `playing.cs`, `hand_back.cs`, `round.ps1` (a complete editor round with a deadline). Paths come from environment variables; nothing is hard-coded to one machine.
+- `templates/`: `kickoff.md` (first messages for every session, and how sessions message each other), `CLAUDE.md`, `TEAM.md`, `PRD.md`, `chapter.md`, `brief.md`, `backlog.md`, `morning-report.md`, `night-plan.md`, `devlog.md`, `RECOVERY.md`, `art-board.md` (style guide, task board, channel), `prompts.md` (11 image and review prompts).
+- `assets/unity/Runtime/`: `StoryDirectorBase` (Conversation / Monologue / Musing, camera never taken), `Loc` + `LocText` (TSV string tables), `InteractPoint` + `PlayerInteractor` (one rebindable key, press and hold), `GripSocket` (props keep real size in scaled rigs), `RuntimeNavMeshBaker`. `assets/unity/Editor/`: `Level01Builder` (scene-from-code template), `ReviewShots` (edit-mode review cameras), `EditorStateBeacon` (state file for the guard and the hook; pauses imports during Play), `WebBuild` (one-click WebGPU/WebGL2 build with a size report). `assets/unity/Examples/Level01Director.cs`. They compile against Unity 6 (6000.3); treat them as starting points.
+- `scripts/`: `guard` (PowerShell and bash; CLI or beacon mode), `lock`, `playing.cs`, `hand_back.cs`, `refresh.cs`, `review_shots.cs`, `round.ps1` (a complete editor round with a deadline), `dialog_watch.ps1`, and `hooks/` (a Claude Code hook that blocks writes into `Assets/` during Play, plus a settings example with a permission allow-list). Paths come from environment variables; nothing is hard-coded to one machine.
 
 Scripts live next to this file; resolve them relative to this SKILL.md's folder (for a plugin install, that is under the plugin's `skills/game-studio/`).

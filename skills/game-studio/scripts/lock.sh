@@ -69,7 +69,10 @@ take)
         if ( set -o noclobber; line > "$L" ) 2>/dev/null; then :; fi
         sleep 2
         if [ -f "$L" ] && [ "$(owner_of "$L")" = "$OWNER" ]; then echo "taken $NAME.lock $(date '+%T')"; exit 0; fi
-      elif [ "$msg" != "$last" ]; then last="$msg"; echo "waiting: guard $g $msg"; fi
+      else
+        [ "$msg" != "$last" ] && { last="$msg"; echo "waiting: guard $g $msg"; }
+        sleep 12   # the guard asks the editor; while the human plays, don't ask every 3 s
+      fi
     else
       cur="$(first_line "$L")"; [ "$cur" != "$last" ] && { last="$cur"; echo "waiting: $cur"; }
     fi

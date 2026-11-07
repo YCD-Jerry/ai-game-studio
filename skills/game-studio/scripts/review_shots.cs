@@ -8,7 +8,7 @@
 // never triggers an import, even while someone plays.
 //
 // Spec, one key=value per line, '#' comments. Coordinates are world space (or offsets from anchor= when given):
-//   out=D:/shots/round7            output folder (default <project>/Temp/game-studio/shots); created if missing
+//   out=<absolute folder for PNGs>            output folder (default <project>/Temp/game-studio/shots); created if missing
 //   scene=Assets/Scenes/Ch1.unity  open this scene first (refused if any loaded scene has unsaved changes)
 //   size=1280x720
 //   post=1                         post-processing on the ad-hoc camera (URP, set by reflection; ignored elsewhere)

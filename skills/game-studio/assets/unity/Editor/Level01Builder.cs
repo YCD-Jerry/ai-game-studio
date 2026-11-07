@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
-using Game.World;                          // RuntimeNavMeshBaker, see (a2)
+using Game.World;                          // RuntimeNavMeshBaker (Runtime/RuntimeNavMeshBaker.cs)
 
 namespace Game.EditorTools
 {
@@ -52,7 +52,7 @@ namespace Game.EditorTools
                 surface.collectObjects = CollectObjects.All;
                 surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;  // colliders decide what is walkable
                 surface.layerMask = ~(1 << k_IgnoreRaycast);
-                env.AddComponent<RuntimeNavMeshBaker>();                          // runtime script, see (a2)
+                env.AddComponent<RuntimeNavMeshBaker>();                          // bakes the NavMesh when the scene loads
 
                 Box("Ground", env.transform, new Vector3(0f, -0.5f, 0f), new Vector3(80f, 1f, 80f), "Ground", Solid.Yes);
                 Box("Rock", env.transform, new Vector3(4f, 0.5f, 6f), new Vector3(1.5f, 1f, 1.2f), "Rock", Solid.Yes);
@@ -74,7 +74,7 @@ namespace Game.EditorTools
                 if (File.Exists(k_ScenePath))
                     EditorSceneManager.OpenScene(k_ScenePath, OpenSceneMode.Single);
                 else
-                    EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single); // UNSURE: still Untitled; prefer opening a known clean scene
+                    EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single); // first build failed: this scene is still Untitled, so open your light scene here if you have one
                 if (Application.isBatchMode)
                     EditorApplication.Exit(1);
                 throw;
@@ -152,7 +152,7 @@ namespace Game.EditorTools
                 var box = go.AddComponent<BoxCollider>();
                 var s = go.transform.lossyScale;
                 box.center = go.transform.InverseTransformPoint(b.center);
-                box.size = new Vector3(b.size.x / Mathf.Abs(s.x), b.size.y / Mathf.Abs(s.y), b.size.z / Mathf.Abs(s.z)); // UNSURE: AABB, approximate when rotated
+                box.size = new Vector3(b.size.x / Mathf.Abs(s.x), b.size.y / Mathf.Abs(s.y), b.size.z / Mathf.Abs(s.z)); // world-space bounds: a loose fit when the object is rotated; add a fitted collider by hand for those
             }
             s_Solid++;
         }

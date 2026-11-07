@@ -60,12 +60,24 @@ if [ -f "$EL" ]; then
   fi
 fi
 
+# 3a. beacon mode (GAME_STUDIO_PLAY_PROBE=beacon): read <project>/Temp/editor_state.txt written by EditorStateBeacon.cs
+if [ "${GAME_STUDIO_PLAY_PROBE:-cli}" = "beacon" ]; then
+  ST="$(to_posix "$PROJ")/Temp/editor_state.txt"
+  [ -f "$ST" ] || { echo "guard: no $ST (beacon not installed or editor closed)"; exit 4; }
+  s_age=$(( $(date +%s) - $(mtime "$ST") ))
+  [ "$s_age" -le 10 ] || { echo "editor state ${s_age}s old (closed, busy or a modal dialog) - not touching it"; exit 4; }
+  grep -q 'playing=True\|willPlay=True' "$ST" && { echo "UNITY IS IN PLAY MODE - not touching it"; exit 3; }
+  grep -q 'playing=False' "$ST" || { echo "guard: unreadable beacon state - not touching it"; exit 4; }
+  exit 0
+fi
+
 # 3. play state -> 3 / 4
 PROBE="$EVALDIR/playing.cs"
 [ -f "$PROBE" ] || { echo "guard: missing $PROBE"; exit 4; }
 export UNITY_NO_BANNER=1 UNITY_NO_PAGER=1 UNITY_NON_INTERACTIVE=1
 if command -v timeout >/dev/null 2>&1; then T=(timeout -k 5 $((EVT + 30))); else T=(); fi
-r=$("${T[@]}" "$UNITY" command script eval_file --file "$(to_native "$PROBE")" --timeout "$EVT" 2>&1)
+read -r -a EVALCMD <<< "${GAME_STUDIO_EVAL_CMD:-command script eval_file}"   # differs between CLI versions
+r=$("${T[@]}" "$UNITY" "${EVALCMD[@]}" --file "$(to_native "$PROBE")" --timeout "$EVT" 2>&1)
 if printf '%s' "$r" | grep -q 'playing=True'; then echo "UNITY IS IN PLAY MODE - not touching it"; exit 3; fi
 if ! printf '%s' "$r" | grep -q 'playing=False'; then
   echo "Could not read Unity's play state - not touching it"

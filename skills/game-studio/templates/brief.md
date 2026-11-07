@@ -29,7 +29,7 @@
 - [play] <what the director will check; mark "awaiting playtest">
 
 ## Standing rules (always)
-No Play mode (the director tests). Guard before compile/rebuild/import or any write into `Assets/`; one editor via `editor.lock`; save and hand back after. Stage new scripts outside `Assets/`. Commit by path, push at once, nothing over 50 MB, message starts with the item number and ends with `Colliders: …`. Interact key <F>. Never take the camera. Three tries without improvement: stop and report numbers.
+No Play mode (the director tests). Guard before compile/rebuild/import or any write into `Assets/`; one editor via `editor.lock`; save and hand back after. Stage new scripts outside `Assets/`. Commit by path, push at once, nothing over 50 MB, message starts with the item number and ends with `Colliders: …`. Interact key <KEY>. Never take the camera. Three tries without improvement: stop and report numbers.
 
 ## Report back with
 What changed · commits · checks run with numbers · **what is not verified** · where the director should look · anything another session must do next.

@@ -19,7 +19,7 @@ Read this when creating the project, adding a system, wiring a chapter, or debug
 ## 1. Project shape
 
 ```
-Assets/<Game>/
+Assets/Game/          (rename "Game" to your project; the skeletons use this path and the Game.* namespaces)
   Scripts/Core       static services: input map, settings + save, chapter flow, Loc, pause flag
   Scripts/Gameplay   player, interactables, companions, humanoid animator + foot IK, camera look, grip sockets
   Scripts/Narrative  StoryDirectorBase + one ChNDirector per chapter
@@ -30,7 +30,7 @@ Assets/<Game>/
   Art/  Localization/Source/*.tsv  Scenes/
 ```
 
-- **Use assembly definitions** for Core, Gameplay, Narrative and Editor. The source project had none, so every edit recompiled everything, and "Unity compiled between two of my file writes" broke the project for every session several times.
+- **Use assembly definitions** for Core, Gameplay, Narrative and Editor (the Editor assembly references the runtime ones; `Level01Builder` uses `Game.World`). The source project had none, so every edit recompiled everything, and "Unity compiled between two of my file writes" broke the project for every session several times.
 - Packages that earned their place: URP, Cinemachine 3, Input System (actions defined in code), AI Navigation (NavMeshSurface), TextMeshPro. Story flow is coroutines, not Timeline: beats wait on player actions, branch, hint, checkpoint and skip, and coroutines read like the chapter script and diff well for AI sessions.
 - **Fast Enter Play Mode** (no domain or scene reload) makes Play start in seconds, but statics survive between plays. Every class with statics resets them in `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` (see `Loc.cs`).
 
@@ -61,6 +61,8 @@ A shared element built into every scene (the pause menu, the HUD) means a change
 - Add a static check that greps every director for raw subtitle calls that bypass staging and for speakers with no body.
 
 Keys beyond movement in the source project: Space/Enter/click advance; a skip key skips to where the player can move again; autoplay; Esc pause; map, settings and bag keys. The interact key is one key everywhere (F there), defined in code and rebindable.
+
+Packages to add: Universal RP, Input System, AI Navigation, Cinemachine 3, TextMeshPro (in uGUI); Unity Localization and Addressables only if you take the heavier localization route.
 
 ## 4. Player, camera, animation, companions
 
@@ -110,7 +112,7 @@ PlayerPrefs (IndexedDB on the web) is enough for a story game: settings, unlocke
 
 ## 10. Web build
 
-- A menu "Build/Web": graphics APIs `[WebGPU, WebGL2]` (not automatic), Brotli with decompression fallback (works on hosts that can't set Content-Encoding, such as GitHub Pages), data caching, hashed file names, strip engine code, Addressables built with the player; then a size report (every file sorted by size, total, build errors) beside the build.
+- `assets/unity/Editor/WebBuild.cs` (menu `Game/Build/Web Player`): graphics APIs `[WebGPU, WebGL2]` (not automatic), Brotli with decompression fallback (works on hosts that can't set Content-Encoding, such as GitHub Pages), data caching, hashed file names, strip engine code, Addressables built with the player; then a size report (every file sorted by size, total, build errors) beside the build.
 - A full web build takes 10–30 minutes and holds the editor: never run it on the shared editor while others work or the director plays; schedule it or use a second project copy.
 - Packaging for fast first load comes later (main bundle ≤ ~30 MB, per-chapter Addressables groups, a chapter card hiding progress). First wins: texture import sizes, font subsetting, compressed illustrations.
 
@@ -118,7 +120,7 @@ PlayerPrefs (IndexedDB on the web) is enough for a story game: settings, unlocke
 
 Sessions inspect the editor through a CLI or MCP (e.g. `unity command script eval_file --file x.cs`, `editor invoke_menu`, `script recompile`, `console get`). Eval files live **outside** the project (writing into `Assets/` triggers an import).
 
-- State probe: `assets/unity/Editor/EditorStateBeacon.cs` writes `Temp/editor_state.txt` every 2 s (playing, compiling, active scene, dirty, untitled); `scripts/guard.*` reads it. It also pauses auto-refresh while playing, so files dropped into `Assets/` mid-Play aren't imported until Play ends.
+- State probe: `scripts/playing.cs` (run by the guard through the CLI) or `assets/unity/Editor/EditorStateBeacon.cs`, which writes `Temp/editor_state.txt` every 2 s (playing, compiling, active scene, dirty, untitled) for the guard's beacon mode and the write-blocking hook. The beacon also pauses auto-refresh while playing, so files dropped into `Assets/` mid-Play aren't imported until Play ends.
 - Shots: `assets/unity/Editor/ReviewShots.cs` (named cameras → PNGs; async shader compile off, forced skinning recalculation, Animators sampled, everything restored in `finally`). Log a measured number next to every picture and distrust a picture that disagrees with its number.
 - Data checks as editor menus (face-to-face, interact points reachable, companion width vs model, synthetic walks). Each check restores the scene that was open and saves nothing.
 

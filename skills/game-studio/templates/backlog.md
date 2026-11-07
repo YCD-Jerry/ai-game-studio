@@ -1,6 +1,6 @@
 # <YYYY-MM-DD> playtest feedback (round <R>)
 
-Standing rules: see `CLAUDE.md` and `SourceArt/TEAM.md` §6. No Play mode; guard and lock before compile/rebuild; commit by path and push; interact key <F>; never take the camera; decide every collider; three tries then stop.
+Standing rules: see `CLAUDE.md` and `SourceArt/TEAM.md` §6. No Play mode; guard and lock before compile/rebuild; commit by path and push; interact key <KEY>; never take the camera; decide every collider; three tries then stop.
 Mark each item at the end: `→ done <commit> (awaiting playtest)` or `→ not done: <reason>`. **Nothing counts as done until the director has played it.**
 Pre-allocated image order numbers for this round: ART-<x>…ART-<y>. Screenshots: `docs/backlog/playtest-<YYYYMMDD>/<n>.png`.
 

@@ -71,7 +71,7 @@ Each rule: one line, then the date and the incident that created it. Examples to
 1. **Never overwrite files.** New versions are `_v2`, `_v3`.
 2. **Edit only files you own.** Shared files are assigned by the commander first.
 3. **Only Claude runs git; commit by path** (`git commit -m … -- <paths>`); push after every commit; no file over 50 MB.
-4. **Interact key is always <F>**, in code, prompts and docs.
+4. **Interact key is always <KEY>**, in code, prompts and docs.
 5. **No hard-coded player text**; everything in the string tables.
 6. **Scenes are generated from code**; never hand-edit scene files.
 7. **The director does all playtesting.** No session drives Play mode. Edit-mode screenshots only for looks.
