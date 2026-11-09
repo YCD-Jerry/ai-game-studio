@@ -12,7 +12,7 @@ Distilled from *The Yellow Brick Road*, a 3D storybook web game of L. Frank Baum
 
 | | |
 |---|---|
-| Time | 17 days |
+| Time | 15 days |
 | Team | 1 human director, ~20 Claude Code sessions (up to ~8 at once), an image AI, Tripo, Blender |
 | Output | 9 chapters, 17 code-generated scenes, ~72k lines of C#, ~40k lines of Blender Python |
 | Process | 1,325 commits, 356 image orders, 256 numbered playtest notes over 13 rounds, 16 daily devlog entries |

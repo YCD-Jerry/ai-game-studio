@@ -1,6 +1,6 @@
 # Pitfalls: 30 lessons that cost the most
 
-Each lesson is a real incident from a 17-day multi-agent build. Format: **symptom → root cause → fix → rule**. Ranked by time lost × how likely it is to happen to you. Read the top ten before starting; search the rest when something smells familiar.
+Each lesson is a real incident from a 15-day multi-agent build. Format: **symptom → root cause → fix → rule**. Ranked by time lost × how likely it is to happen to you. Read the top ten before starting; search the rest when something smells familiar.
 
 ## The shared editor and the build
 

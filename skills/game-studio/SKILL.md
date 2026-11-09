@@ -6,7 +6,7 @@ license: MIT
 
 # Game Studio
 
-Distilled from *The Yellow Brick Road*: a 3D storybook web game of the 1900 *Wizard of Oz*, built in 17 days by one human director and ~20 Claude Code sessions (1,325 commits, 9 chapters, 13 playtest rounds). See `references/case-study.md`.
+Distilled from *The Yellow Brick Road*: a 3D storybook web game of the 1900 *Wizard of Oz*, built in 15 days by one human director and ~20 Claude Code sessions (1,325 commits, 9 chapters, 13 playtest rounds). See `references/case-study.md`.
 
 ## The idea in five lines
 
