@@ -26,6 +26,7 @@ Read this when building for the web, deploying, making the launch video, opening
 - [ ] Every chapter reachable from the menu; nothing stuck behind a dev key.
 - [ ] No `#missing_key` text, no placeholder boxes, no console errors in the browser.
 - [ ] A way to report bugs (a thread, an issue tracker) linked from the page.
+- [ ] Cover, store art, link preview and post images ordered with a safe area and checked as real crops (`references/art-pipeline.md` §6, item 10).
 
 ## 3. The 60-second video
 

@@ -76,6 +76,7 @@ The image AI (for example GPT image through the Codex app, working only inside t
 - Input: concept/ref/ART-123/ (game screenshots, model renders, layout guide)
 - Output: concept/ART-123_short_name_v1.png (+ _front/_left/_back/_right if split)
 - Size: 1536x1024 | 2048x1024 | 2048x1536
+- Safe area (images for sites and posts): where the words and subject must stay, what may be cut
 - Self-check: what the artist verifies before delivering
 - Next: where it goes after passing (Tripo multiview, narration page key…)
 - Prompt: ```text … ```
@@ -117,6 +118,7 @@ Put the image beside its screenshot and model renders at full size. Report each 
 7. **Consistency across a set**: the same object is the identical object in every image.
 8. **For Tripo-bound sheets**: complete fingers, clear back of head, left/right views in the right slots, figure ≥ 80% of the height, views not crossing split lines.
 9. **Transparent assets**: real alpha (not a painted checkerboard), corners alpha 0, no half-transparent haze, ≥ 64 px between items on a sheet.
+10. **Images for sites and posts survive cropping**: store art, covers, link previews and social images are cropped differently by each device and feed. Run `scripts/crop_sheet.py <image> <out.jpg>` (needs Pillow) and look at the result: 5:2, 16:9, 1.91:1 and a 400 px wide thumbnail. Words stay whole and readable, and the subject survives, or it fails. The crops are centred, so also check any platform template that crops elsewhere, then look at the real page on a phone and a computer after uploading. Compose very different ratios separately instead of cutting one image to fit all.
 
 Also review against the style guide before any spend downstream: one turnaround matched its order but contained a hairstyle the style guide bans, passed, and a whole character's Tripo credits were wasted.
 
