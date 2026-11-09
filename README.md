@@ -83,11 +83,11 @@ Then start with `SKILL.md` → "Start a project" and the kickoff messages in `te
 - Claude Code, ideally several sessions (the desktop app or terminals).
 - Unity 6 with Web Build Support, driven by the Unity CLI (`unity command ...`) or an MCP bridge your sessions can call. Without a CLI, the guard runs in beacon mode (see `references/editor-safety.md`).
 - Python 3 for the write-blocking hook (optional but recommended).
-
-Note: `scripts/round.ps1` starts `dialog_watch.ps1` in the background, which clicks "Try Again" on Unity's "Opening file failed" dialog; pass `-NoDialogWatch` if you don't want that.
 - Blender 4+ (headless scripts).
 - An image model (e.g. GPT image in the Codex app) and an AI-3D tool (e.g. Tripo) with an account you control. Claude never logs in or pays; you do.
 
+Note: `scripts/round.ps1` starts `dialog_watch.ps1` in the background, which clicks "Try Again" on Unity's "Opening file failed" dialog; pass `-NoDialogWatch` if you don't want that.
+
 ## Credits
 
-Inspired by Sac's *The Little Prince: Across the Stars* ([littleprince.dev](https://littleprince.dev)) and his public write-up of building it with Opus, Tripo, Blender and Unity. Made by @雷霆俊叶 [@ycdjry](https://github.com/ycdjry) with Claude.
+Inspired by Sac's *The Little Prince: Among the Stars* ([littleprince.dev](https://littleprince.dev)) and his public write-up of building it with Opus, Tripo, Blender and Unity. Made by @雷霆俊叶 [@ycdjry](https://github.com/ycdjry) with Claude.

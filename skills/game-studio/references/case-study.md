@@ -51,4 +51,4 @@ Honest caveats: most late changes were checked only by data and screenshots and 
 
 ## Inspiration
 
-The method started from Sac's *The Little Prince: Across the Stars* (littleprince.dev), a 3D story web game made with Opus, Tripo, Blender and Unity, and his public write-up of the pipeline (reference sheets, asset breakdown, Tripo multiview characters, Mixamo, IK touch-ups). This project added the multi-session studio structure, the safety rails for a shared editor, and the playtest and quality loop.
+The method started from Sac's *The Little Prince: Among the Stars* (littleprince.dev), a 3D story web game made with Opus, Tripo, Blender and Unity, and his public write-up of the pipeline (reference sheets, asset breakdown, Tripo multiview characters, Mixamo, IK touch-ups). This project added the multi-session studio structure, the safety rails for a shared editor, and the playtest and quality loop.
