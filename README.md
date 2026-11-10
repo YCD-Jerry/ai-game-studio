@@ -37,6 +37,7 @@ skills/game-studio/
 │   ├── pitfalls.md             30 lessons: symptom → root cause → fix → rule
 │   ├── hackathon.md            one scene in a day with three sessions
 │   ├── shipping.md             web build, the 60-second video, launch, opening the source safely
+│   ├── showreel.md             the launch film from the running game: capture, drone shots, cuts on the bar
 │   └── case-study.md           the project in numbers, what worked, what slowed it down
 ├── templates/                  kickoff messages, CLAUDE.md, TEAM.md, PRD, chapter, brief, backlog,
 │                               morning report, night plan, devlog, recovery, art board, 11 prompts
@@ -44,7 +45,8 @@ skills/game-studio/
 │                               scene builder, story director, TSV localization, interact key,
 │                               grip socket, runtime NavMesh, review shots, editor state beacon, web build
 └── scripts/                    guard, lock, play-state probe, hand back, a full editor round,
-                                a dialog watcher, and a Claude Code hook that blocks writes into
+                                a dialog watcher, a crop sheet, showreel/ (frame capture in Play,
+                                cuts and checks), and a Claude Code hook that blocks writes into
                                 Assets/ while Unity is playing
 ```
 

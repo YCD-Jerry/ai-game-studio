@@ -30,7 +30,7 @@ Read this when building for the web, deploying, making the launch video, opening
 
 ## 3. The 60-second video
 
-The link gets played only if the video stops people scrolling. Plan it before recording.
+The link gets played only if the video stops people scrolling. Plan it before recording. How to shoot, cut and check it from the running game (frame capture in Play, scripted cameras, real key presses, cuts on the bar, export checks) is its own branch: `references/showreel.md`.
 
 - **Structure** (60 s, 16:9, 1920×1080, 60 fps): 0–3 s hook (the most striking contrast in the game, e.g. a dark room opening onto a bright world, with one line of on-screen text that says why this is unusual) → 3–45 s only beauty: the five or six best shots, one camera move each (push, orbit or follow, never all three) → a calm "breath" shot → the climax shot on the music's fullest bar → 45–55 s how it was made (two or three stills: the sessions running, an AI-3D white model turning into the in-game character, day-one graybox vs today) → 55–60 s end card with the title lettering, "play in your browser" and the link.
 - **First frame already beautiful**: platforms use it as the thumbnail. No fade from black.

@@ -48,7 +48,7 @@ Details: `references/production-loop.md`, `references/art-pipeline.md`, `referen
 
 ## Hard rules (and why each exists)
 
-1. **The director does all playtesting; no session drives Play mode.** Play in a shared editor interrupts everyone and the human's judgement is the scarce resource. Edit-mode screenshots are fine for looks, never as a test of gameplay.
+1. **The director does all playtesting; no session drives Play mode.** Play in a shared editor interrupts everyone and the human's judgement is the scarce resource. Edit-mode screenshots are fine for looks, never as a test of gameplay. The one exception is recording a showreel, granted by the director in words, written into the team brief, and used only to record (`references/showreel.md`).
 2. **The project must not change while the director plays.** Run the guard before any recompile, rebuild, reimport or write into `Assets/`; exit 3 = playing, go do something else. A file dropped mid-Play killed every coroutine and froze the story at its climax.
 3. **One editor, one holder.** Only the custodian starts Unity; everyone takes `editor.lock`, works, saves, hands back to a light scene, releases. Every job holding the lock has a total deadline and releases in `finally` (one job without a deadline froze everyone for an hour).
 4. **Stage co-dependent scripts outside `Assets/` and move them in together.** Unity compiles between file writes; half-written batches broke the build for every session.
@@ -90,12 +90,13 @@ The full set with incidents: `references/pitfalls.md` (30 lessons) and `referenc
 | Something smells familiar | `references/pitfalls.md` |
 | In a hackathon | `references/hackathon.md` |
 | Releasing: web build, video, launch post, open source | `references/shipping.md` |
+| Making the launch video or showreel from the running game | `references/showreel.md`, `scripts/showreel/` |
 | Explaining the method, calibrating expectations | `references/case-study.md` |
 
 ## Bundled files
 
 - `templates/`: `kickoff.md` (first messages for every session, and how sessions message each other), `CLAUDE.md`, `TEAM.md`, `PRD.md`, `chapter.md`, `brief.md`, `backlog.md`, `morning-report.md`, `night-plan.md`, `devlog.md`, `RECOVERY.md`, `art-board.md` (style guide, task board, channel), `prompts.md` (11 image and review prompts).
 - `assets/unity/Runtime/`: `StoryDirectorBase` (Conversation / Monologue / Musing, camera never taken), `Loc` + `LocText` (TSV string tables), `InteractPoint` + `PlayerInteractor` (one rebindable key, press and hold), `GripSocket` (props keep real size in scaled rigs), `RuntimeNavMeshBaker`. `assets/unity/Editor/`: `Level01Builder` (scene-from-code template), `ReviewShots` (edit-mode review cameras), `EditorStateBeacon` (state file for the guard and the hook; pauses imports during Play), `WebBuild` (one-click WebGPU/WebGL2 build with a size report). `assets/unity/Examples/Level01Director.cs`. They compile against Unity 6 (6000.3); treat them as starting points.
-- `scripts/`: `guard` (PowerShell and bash; CLI or beacon mode), `lock`, `playing.cs`, `hand_back.cs`, `refresh.cs`, `review_shots.cs`, `round.ps1` (a complete editor round with a deadline), `dialog_watch.ps1`, `crop_sheet.py` (a review sheet of how an image for a site or post crops), and `hooks/` (a Claude Code hook that blocks writes into `Assets/` during Play, plus a settings example with a permission allow-list). Paths come from environment variables; nothing is hard-coded to one machine.
+- `scripts/`: `guard` (PowerShell and bash; CLI or beacon mode), `lock`, `playing.cs`, `hand_back.cs`, `refresh.cs`, `review_shots.cs`, `round.ps1` (a complete editor round with a deadline), `dialog_watch.ps1`, `crop_sheet.py` (a review sheet of how an image for a site or post crops), `showreel/` (capture library, an example shot, runner, clip, contact sheet, music sync check, private-word scan), and `hooks/` (a Claude Code hook that blocks writes into `Assets/` during Play, plus a settings example with a permission allow-list). Paths come from environment variables; nothing is hard-coded to one machine.
 
 Scripts live next to this file; resolve them relative to this SKILL.md's folder (for a plugin install, that is under the plugin's `skills/game-studio/`).
