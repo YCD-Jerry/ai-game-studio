@@ -34,9 +34,10 @@ skills/game-studio/
 │   ├── props-and-buildings.md  Blender from code, in parts, QA gates, Blender↔Unity traps
 │   ├── unity-architecture.md   builders, story director, camera, colliders, localization, web build
 │   ├── editor-safety.md        many sessions, one editor: guard, lock, rounds, honest checks
-│   ├── pitfalls.md             30 lessons: symptom → root cause → fix → rule
+│   ├── pitfalls.md             35 lessons: symptom → root cause → fix → rule
 │   ├── hackathon.md            one scene in a day with three sessions
 │   ├── shipping.md             web build, the 60-second video, launch, opening the source safely
+│   ├── web-packaging.md        loading chapter by chapter, measured first; when the web build differs from the editor
 │   ├── showreel.md             the launch film from the running game: capture, drone shots, cuts on the bar
 │   └── case-study.md           the project in numbers, what worked, what slowed it down
 ├── templates/                  kickoff messages, CLAUDE.md, TEAM.md, PRD, chapter, brief, backlog,
@@ -45,7 +46,8 @@ skills/game-studio/
 │                               scene builder, story director, TSV localization, interact key,
 │                               grip socket, runtime NavMesh, review shots, editor state beacon, web build
 └── scripts/                    guard, lock, play-state probe, hand back, a full editor round,
-                                a dialog watcher, a crop sheet, showreel/ (frame capture in Play,
+                                a dialog watcher, a reference check before builds,
+                                a crop sheet, showreel/ (frame capture in Play,
                                 cuts and checks), and a Claude Code hook that blocks writes into
                                 Assets/ while Unity is playing
 ```

@@ -1,4 +1,4 @@
-# Pitfalls: 30 lessons that cost the most
+# Pitfalls: 35 lessons that cost the most
 
 Each lesson is a real incident from a 15-day multi-agent build. Format: **symptom → root cause → fix → rule**. Ranked by time lost × how likely it is to happen to you. Read the top ten before starting; search the rest when something smells familiar.
 
@@ -70,10 +70,32 @@ Each lesson is a real incident from a 15-day multi-agent build. Format: **sympto
 
 **30. Ridiculous staging.** Comical 3D hugs, riding and chopping without proper animation. → Trying to stage everything in 3D. → Hugs became illustrations; a long backstory became a six-panel comic. → **If the engine can't perform it well, change the telling.**
 
+## Web and long runs
+
+**31. Holes only in the web build.** A pit was a flat green plane, the bricks under her feet were gone, and trees showed only within ten metres. The director suspected an "optimisation". Shaders, readable flags and LOD bias were blamed first. → Scene generators rewrote their meshes into a `.asset` with new fileIDs on every rebuild. The scenes were committed without those assets, and the build checkout comes from git. → Commit the assets; run `scripts/refcheck.py` before every build; make generators overwrite meshes in place so fileIDs stay stable. → **When the build differs from the editor, diff git against the working copy before blaming the platform.** (`references/web-packaging.md` §8)
+
+**32. A split that made the build bigger.** The first chapter-by-chapter web build grew from 1126 to 1405 MB. → The menu stayed a built-in scene, so everything it shared with the packs was stored twice. → Only an empty boot scene is built in; groups are generated from "which scenes use it". → **Measure the build you made, not the one you planned.** (`references/web-packaging.md`)
+
+**33. A probe that couldn't be stopped.** One eval compiling every shader variant (2,880) held the editor for over 35 minutes, and nothing could cancel it. → The deadline lived only in the wrapper, and a running eval can't be interrupted from outside. → Every loop inside an eval carries its own time box and does a sample, not everything. → **The deadline belongs inside the work, not around it.**
+
+**34. A dry run that wasn't dry.** Two "dry runs" of a patch script wrote into `Assets/` while the director was playing. → The paths were hard-coded. → Scripts take paths as arguments and refuse repository paths unless given `--real`. → **A dry run must be unable to touch the real thing.**
+
+**35. "It will carry on after the restart."** The director closes the app often (battery, network). → Background commands, watchers and scheduled checks die with the app; batch builds die with the machine; a half-done build leaves changed files in the build checkout. → A restart checklist in `RECOVERY.md`:
+- Push unpushed commits.
+- Clear stale locks only after checking the editor.
+- Check the build checkout.
+- Rerun every job from the start.
+- Re-dispatch work from the session list.
+
+→ **Design jobs to be rerun, not resumed.**
+
 ## Honourable mentions
 
 - Scenes are code-generated; never swap a scene file on disk while it is open (modal reload dialog): hand back first, then restore, then refresh.
 - Lettering: the image AI misspelled CJK titles three times; a reference image with the correct glyphs fixed it.
 - Animal gaits can be measured: a lion's footfall intervals went from 35/12/35/19% to even 25%; foot slide 15 cm → 1.4 cm.
 - The director may edit story text directly in a small local tool writing the string tables; never overwrite those edits.
+- **Never delete a build someone may be testing**: rename the old folder before a new build lands.
+- A loading screen earns a line at its foot. Show one tip from the string tables, with the player's real keys substituted and a hint at the hidden reward, shuffled so none repeats at once.
+- A key that skips a line can also skip an interaction. Then it is a real binding, shown and rebindable in the settings, not a hidden debug key.
 - Git Bash heredocs on Windows collapse `\\` to `\`; write files containing backslashes with a file-writing tool, then scan C# for odd quote counts.

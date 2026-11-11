@@ -20,5 +20,13 @@ GitHub is this project's only backup. Chat history, local memory and `~/.claude`
 | Accounts | which service is used for what (never passwords): image AI, AI 3D, Mixamo, hosting |
 | Network notes | <proxy or region notes, if any> |
 
+## After the app or the machine restarts
+Conversations survive; running things don't. Background commands, watchers and scheduled checks stop with the app. Batch builds stop with the machine. Nothing resumes from where it was.
+1. `git status -sb`: push unpushed commits. If someone else staged files in the shared index, ask that session; don't commit them.
+2. `editor.lock`: if its holder is gone, check that the editor isn't compiling or playing, then remove the lock.
+3. The editor: the custodian opens it if it is closed. If a scene is unsaved, ask whose it is before closing anything.
+4. The build checkout: a build that died leaves changed groups and settings and a half-made output folder. Restore the tracked files, delete untracked leftovers, rename the half-made build.
+5. List the sessions and re-dispatch every interrupted job. Builds and recordings start again from the top.
+
 ## Pipelines learned the hard way
 <Exact UI steps for the AI-3D character pipeline, the import step, the web build and upload. Mark outdated sections "obsolete, kept for history" instead of deleting them.>

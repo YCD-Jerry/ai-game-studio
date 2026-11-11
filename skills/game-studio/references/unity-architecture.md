@@ -114,7 +114,8 @@ PlayerPrefs (IndexedDB on the web) is enough for a story game: settings, unlocke
 
 - `assets/unity/Editor/WebBuild.cs` (menu `Game/Build/Web Player`): graphics APIs `[WebGPU, WebGL2]` (not automatic), Brotli with decompression fallback (works on hosts that can't set Content-Encoding, such as GitHub Pages), data caching, hashed file names, strip engine code, Addressables built with the player; then a size report (every file sorted by size, total, build errors) beside the build.
 - A full web build takes 10–30 minutes and holds the editor: never run it on the shared editor while others work or the director plays; schedule it or use a second project copy.
-- Packaging for fast first load comes later (main bundle ≤ ~30 MB, per-chapter Addressables groups, a chapter card hiding progress). First wins: texture import sizes, font subsetting, compressed illustrations.
+- Packaging for fast first load comes later (main bundle ≤ ~30 MB, per-chapter Addressables groups, a chapter card hiding progress). First wins: texture import sizes, font subsetting, compressed illustrations. The full method, measured on a real 1.9 GB game: `references/web-packaging.md`.
+- On the web, ask Pointer Lock for raw mouse movement (`unadjustedMovement`) and fall back where it is unsupported. Otherwise browsers deliver occasional huge deltas that look like the camera cutting.
 
 ## 11. Inspecting without Play mode
 

@@ -52,7 +52,7 @@ Details: `references/production-loop.md`, `references/art-pipeline.md`, `referen
 2. **The project must not change while the director plays.** Run the guard before any recompile, rebuild, reimport or write into `Assets/`; exit 3 = playing, go do something else. A file dropped mid-Play killed every coroutine and froze the story at its climax.
 3. **One editor, one holder.** Only the custodian starts Unity; everyone takes `editor.lock`, works, saves, hands back to a light scene, releases. Every job holding the lock has a total deadline and releases in `finally` (one job without a deadline froze everyone for an hour).
 4. **Stage co-dependent scripts outside `Assets/` and move them in together.** Unity compiles between file writes; half-written batches broke the build for every session.
-5. **Verify artefacts, not exit codes.** A builder prints `Built <scene>` last; check that line or the scene file's time. Menu calls reported success after a builder threw.
+5. **Verify artefacts, not exit codes.** A builder prints `Built <scene>` last; check that line or the scene file's time. Menu calls reported success after a builder threw. Commit a rebuilt scene together with the assets its generator wrote, and have `scripts/refcheck.py` exit 0 before any build; a scene committed alone left holes in the web build.
 6. **Commit by path, push every commit, nothing over 50 MB.** Sessions share one git index; one 105 MB file blocked every push. GitHub is the only backup.
 7. **Decide a collider for every placed object** and write `Colliders: …` in the commit. Moving things go on Ignore Raycast; NavMesh bakes from physics colliders at load.
 8. **Never take the camera away.** Story beats may hold the character still; the player can always look around. Lines spoken while the player can walk advance by themselves.
@@ -65,7 +65,7 @@ Details: `references/production-loop.md`, `references/art-pipeline.md`, `referen
 15. **Anything needing an account, payment, credits or accepting terms goes to the director.** Never type passwords; log every paid generation.
 16. **What the director edits directly is theirs.** Give them local tools for the things taste decides (story text in the string tables, screen layouts in a layout JSON) and never overwrite their saves. Layouts follow shared columns, mirrored rows, one axis per text column and hierarchy by size (`references/layout-and-ui.md`).
 
-The full set with incidents: `references/pitfalls.md` (30 lessons) and `references/editor-safety.md`.
+The full set with incidents: `references/pitfalls.md` (35 lessons) and `references/editor-safety.md`.
 
 ## How sessions talk
 
@@ -89,6 +89,7 @@ The full set with incidents: `references/pitfalls.md` (30 lessons) and `referenc
 | Touching the shared editor: guard, lock, rounds, shots | `references/editor-safety.md`, `scripts/` |
 | Something smells familiar | `references/pitfalls.md` |
 | In a hackathon | `references/hackathon.md` |
+| Making the web build load chapter by chapter; a web build that differs from the editor; optional content | `references/web-packaging.md`, `scripts/refcheck.py` |
 | Releasing: web build, video, launch post, open source | `references/shipping.md` |
 | Making the launch video or showreel from the running game | `references/showreel.md`, `scripts/showreel/` |
 | Explaining the method, calibrating expectations | `references/case-study.md` |
@@ -97,6 +98,6 @@ The full set with incidents: `references/pitfalls.md` (30 lessons) and `referenc
 
 - `templates/`: `kickoff.md` (first messages for every session, and how sessions message each other), `CLAUDE.md`, `TEAM.md`, `PRD.md`, `chapter.md`, `brief.md`, `backlog.md`, `morning-report.md`, `night-plan.md`, `devlog.md`, `RECOVERY.md`, `art-board.md` (style guide, task board, channel), `prompts.md` (11 image and review prompts).
 - `assets/unity/Runtime/`: `StoryDirectorBase` (Conversation / Monologue / Musing, camera never taken), `Loc` + `LocText` (TSV string tables), `InteractPoint` + `PlayerInteractor` (one rebindable key, press and hold), `GripSocket` (props keep real size in scaled rigs), `RuntimeNavMeshBaker`. `assets/unity/Editor/`: `Level01Builder` (scene-from-code template), `ReviewShots` (edit-mode review cameras), `EditorStateBeacon` (state file for the guard and the hook; pauses imports during Play), `WebBuild` (one-click WebGPU/WebGL2 build with a size report). `assets/unity/Examples/Level01Director.cs`. They compile against Unity 6 (6000.3); treat them as starting points.
-- `scripts/`: `guard` (PowerShell and bash; CLI or beacon mode), `lock`, `playing.cs`, `hand_back.cs`, `refresh.cs`, `review_shots.cs`, `round.ps1` (a complete editor round with a deadline), `dialog_watch.ps1`, `crop_sheet.py` (a review sheet of how an image for a site or post crops), `showreel/` (capture library, an example shot, runner, clip, contact sheet, music sync check, private-word scan), and `hooks/` (a Claude Code hook that blocks writes into `Assets/` during Play, plus a settings example with a permission allow-list). Paths come from environment variables; nothing is hard-coded to one machine.
+- `scripts/`: `guard` (PowerShell and bash; CLI or beacon mode), `lock`, `playing.cs`, `hand_back.cs`, `refresh.cs`, `review_shots.cs`, `round.ps1` (a complete editor round with a deadline), `dialog_watch.ps1`, `refcheck.py` (every scene reference into a generated asset must resolve in git; run it before every build), `crop_sheet.py` (a review sheet of how an image for a site or post crops), `showreel/` (capture library, an example shot, runner, clip, contact sheet, music sync check, private-word scan), and `hooks/` (a Claude Code hook that blocks writes into `Assets/` during Play, plus a settings example with a permission allow-list). Paths come from environment variables; nothing is hard-coded to one machine.
 
 Scripts live next to this file; resolve them relative to this SKILL.md's folder (for a plugin install, that is under the plugin's `skills/game-studio/`).
