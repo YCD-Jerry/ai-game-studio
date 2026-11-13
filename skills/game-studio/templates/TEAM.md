@@ -1,7 +1,6 @@
 # Team Guide
 
-> Every AI working on this project reads this file first. Anyone may edit it: update progress, add rules, record decisions.
-> Never delete someone else's content; move outdated content to "Archive" at the end.
+> Example for a team working on a story game. Fill in active roles and retain only relevant rules. Record which older rule each decision supersedes.
 
 ## 1. What we are making
 
@@ -39,7 +38,7 @@
 
 | Member | Role | Does | Does not |
 |---|---|---|---|
-| <Director> (human) | Director, final say | direction, all playtesting, logins, purchases, paid generations | write code |
+| <Director> (human) | Director, final say | direction, human playtesting, logins, purchases, paid generations | write code |
 | Claude sessions | Engineering, tech art, animation, reviews, git | all development | log in, pay |
 | Image AI | Concept art, chores | images per ART_QUEUE; edits only `SourceArt/` | engine, code, git, logins |
 
@@ -70,11 +69,11 @@ Each rule: one line, then the date and the incident that created it. Examples to
 
 1. **Never overwrite files.** New versions are `_v2`, `_v3`.
 2. **Edit only files you own.** Shared files are assigned by the commander first.
-3. **Only Claude runs git; commit by path** (`git commit -m … -- <paths>`); push after every commit; no file over 50 MB.
+3. **Git workflow:** <who integrates, how to scope commits, when to push, asset limits>.
 4. **Interact key is always <KEY>**, in code, prompts and docs.
 5. **No hard-coded player text**; everything in the string tables.
 6. **Scenes are generated from code**; never hand-edit scene files.
-7. **The director does all playtesting.** No session drives Play mode. Edit-mode screenshots only for looks.
+7. **Verification:** <isolated runtime test environment, shared editor rules, human playtest owner>.
 8. **The project must not change while the director is playing**: run the guard before any compile, rebuild, import or write into `Assets/`; stage files outside and move them in on exit 0.
 9. **One editor**: only the custodian starts it; take `editor.lock`; save and hand back when done; every job has a total deadline.
 10. **Decide a collider for every object** and state it in the commit (`Colliders: …`).

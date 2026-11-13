@@ -1,6 +1,6 @@
 # game-studio
 
-**Run a studio of Claude Code sessions that builds a 3D game for the web.**
+**Plan, build, and verify playable game slices. Start with one session and add coordination only when the work benefits from it.**
 
 One human directs. A commander session dispatches and reviews. Worker sessions own chapters and systems. An image AI paints, an AI-3D tool makes characters, Blender scripts make buildings, Unity (URP, WebGPU) puts it together. This skill is the playbook: the roles, the rules, the templates, the scripts and the 30 mistakes that taught them.
 
@@ -23,7 +23,7 @@ The interesting part is not the speed but the organisation: a team brief every A
 
 ```
 skills/game-studio/
-├── SKILL.md                    the method in one page: roles, loop, 16 hard rules, reading guide
+├── SKILL.md                    rule precedence, slice workflow, and task-specific references
 ├── references/
 │   ├── studio-roles.md         who does what, file ownership, how orders flow, model tiers
 │   ├── production-loop.md      PRD → chapter → graybox → look passes → playtest loop → overnight runs
@@ -54,43 +54,22 @@ skills/game-studio/
 
 ## Install
 
-**As a plugin** (inside Claude Code):
+From a checkout of this repository, copy the entire [game-studio folder](skills/game-studio/) into your project's skill directory:
 
-```
-/plugin marketplace add ycdjry/ai-game-studio
-/plugin install game-studio@ai-game-studio
-```
+| Host | Destination |
+|---|---|
+| Codex | `.agents/skills/game-studio/` |
+| Claude Code | `.claude/skills/game-studio/` |
 
-Third-party marketplaces don't auto-update by default; run `/plugin marketplace update ai-game-studio` to get new versions.
+The destination should contain `SKILL.md` alongside `references/` and `scripts/`. Open the host in that project and invoke `$game-studio` in Codex or `/game-studio` in Claude Code. The project-level paths are documented by [Codex](https://developers.openai.com/codex/skills/) and [Claude Code](https://code.claude.com/docs/en/skills).
 
-**Or copy the skill folder** (pick one way, not both):
+## Try it on one task
 
-```bash
-git clone https://github.com/ycdjry/ai-game-studio
-cp -r ai-game-studio/skills/game-studio ~/.claude/skills/        # for every project
-# or: cp -r ai-game-studio/skills/game-studio <your-project>/.claude/skills/
-```
+> Use game-studio to reproduce a door that fails after loading a save. Use the existing smoke test in an isolated checkout and report what passed and what needs a human playtest.
 
-## Use
+Start with [SKILL.md](skills/game-studio/SKILL.md). The [project setup guide](skills/game-studio/references/project-setup.md) shows where to keep current decisions, engine settings, and art direction. The [verification guide](skills/game-studio/references/verification.md) covers reference scans, matched captures, runtime checks and playtests. Unity helpers are optional and have their own prerequisites. Runtime tests use the project's own scene, fixtures and assertions.
 
-Just describe the game. The skill triggers on requests like:
-
-- "Turn *Peter Pan* into a small 3D exploration game for the browser."
-- "Set up a team of Claude sessions for my Unity game: one per level, one for art."
-- "We have a hackathon tomorrow, 8 hours, I want a beautiful 3D scene people can play."
-- "Two sessions keep breaking each other's compiles in the same Unity project."
-
-Then start with `SKILL.md` → "Start a project" and the kickoff messages in `templates/kickoff.md`, or `references/hackathon.md` for a one-day build.
-
-## What you need
-
-- Claude Code, ideally several sessions (the desktop app or terminals).
-- Unity 6 with Web Build Support, driven by the Unity CLI (`unity command ...`) or an MCP bridge your sessions can call. Without a CLI, the guard runs in beacon mode (see `references/editor-safety.md`).
-- Python 3 for the write-blocking hook (optional but recommended).
-- Blender 4+ (headless scripts).
-- An image model (e.g. GPT image in the Codex app) and an AI-3D tool (e.g. Tripo) with an account you control. Claude never logs in or pays; you do.
-
-Note: `scripts/round.ps1` starts `dialog_watch.ps1` in the background, which clicks "Try Again" on Unity's "Opening file failed" dialog; pass `-NoDialogWatch` if you don't want that.
+To run the bundled reference checker's regression tests, use `python -B -m unittest discover -s tests -v` from the repository root with Python and Git installed.
 
 ## Credits
 

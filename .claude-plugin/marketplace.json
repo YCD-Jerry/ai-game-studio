@@ -1,12 +1,14 @@
 {
   "name": "ai-game-studio",
-  "description": "The game-studio skill: one human directing a team of Claude Code sessions to build 3D web games.",
-  "owner": { "name": "ycdjry" },
+  "description": "Game Studio for planning, building, and verifying playable game slices.",
+  "owner": {
+    "name": "ycdjry"
+  },
   "plugins": [
     {
       "name": "game-studio",
       "source": "./",
-      "description": "Run a studio of Claude Code sessions that builds a 3D web game with an image AI, Tripo, Blender and Unity."
+      "description": "Includes optional Unity tools and multi-session coordination."
     }
   ]
 }

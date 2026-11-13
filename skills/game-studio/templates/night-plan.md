@@ -16,10 +16,10 @@ Back by: ~<HH:MM>. Spending: <e.g. "quality first, don't count credits" | "keep 
 | <Chapter N> | <…> | <…> |
 
 ## Rules for tonight
-- No Play mode. Guard before compile/rebuild/import; one editor via the lock; save and hand back after.
+- Shared-editor work follows the guard, lock and hand-back procedure. Runtime tests use the designated isolated environment.
 - No long exclusive jobs (full web builds) that block the shared editor.
-- Stage new scripts outside `Assets/`. Commit by path, push every step. Nothing over 50 MB.
-- Unsure? Take the most reasonable default, log it in morning questions, continue. Never wait for an answer.
+- If using a shared Unity editor, stage related scripts outside `Assets/`. Keep checkpoints under the project's Git policy.
+- Log reversible defaults. Keep progressing on independent tasks when a decision requires input.
 - Three versions without improvement on one problem: stop, log the numbers, switch approach.
 - Expect quota stops: everything committed, plans in files, so any session can resume.
 - The commander's check timer is session-scoped: recreate it after a restart.

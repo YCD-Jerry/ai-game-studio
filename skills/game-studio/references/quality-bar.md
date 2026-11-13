@@ -1,6 +1,6 @@
 # Quality bar: self-review before the director sees anything
 
-Read this before delivering any chapter, mechanic or asset, and when writing a chapter plan. Copy it into the project as `docs/QUALITY_BAR.md` and grow it with every repeated complaint.
+Use the relevant checks for the requested change. Sections 2–7 preserve The Yellow Brick Road's storybook acceptance bar as a worked example. Select and adapt criteria to the current project's goals, mechanics, target devices and style. For evidence and automation see [Verification](verification.md).
 
 ## Contents
 1. How to use it
@@ -16,10 +16,10 @@ Read this before delivering any chapter, mechanic or asset, and when writing a c
 - Before starting: read the principles and the chapter's must-haves. Hard chapters write a plan against the bar first.
 - While working: check the relevant domain section.
 - Before delivering: run the pre-delivery checklist; the report says which items passed and which were not verified.
-- Every check carries a mark: **[data]** a script can check it; **[image]** a fixed-time sample or edit-mode shot can show it; **[play]** only the director can judge it. Delivering with [data] or [image] checks undone means not finished.
+- Every check carries a mark: **[data]** a script can check it; **[image]** a fixed-time sample or edit-mode shot can show it; **[play]** needs runtime evidence, human judgment, or both. Assertions can prove a state transition. A human judges the resulting feel and pacing. Delivering with [data] or [image] checks undone means not finished.
 - The director's taste overrides this document.
 
-Why it exists: the director is the only one who sees the game run, so everything a script or a picture could have caught wastes the scarcest time on the team. In one 36-item feedback round, ~8 items a scripted run would have caught, ~16 a written checklist should have stopped, and only ~12 needed the director's taste or were new ideas.
+In the original shared-editor workflow, the director was the primary playtester. Static, visual, and isolated runtime checks preserve that time for decisions that need human judgment. In one 36-item feedback round, ~8 items a scripted run would have caught, ~16 a written checklist should have stopped, and only ~12 needed the director's taste or were new ideas.
 
 ## 2. Twelve principles
 
@@ -72,7 +72,7 @@ An overview reference image · one shot the player remembers · a moment where t
 4. Look at your images yourself with a fault-finder's eye: "what will the director say when they see this?" and "what will the player think this is?" (a maze's glass walls with no reflection were read as open doorways).
 5. Every entry path thought through.
 6. Is it a game-wide problem? Fixed everywhere it occurs?
-7. Committed by path, pushed, backlog item marked, decision written into `TEAM.md`.
+7. Update the existing backlog or handoff. Commit or push when the task and project workflow call for it.
 8. Report: what changed, commits, **what is not verified**, where to look.
 
 ## 6. When to stop: what counts as 99

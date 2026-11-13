@@ -18,7 +18,7 @@ The method: a session records the game itself, frame by frame, in Play, with rea
 
 ## 1. Permission and rules
 
-- **Recording in Play is an exception to "no session drives Play".** Ask the director for it in words, record the grant in `TEAM.md` (who may, for what, until when), and use it only to record. Never use the recording session to test gameplay; a bug seen on camera goes to the commander as a numbered note.
+- **Use the designated capture environment.** Follow the project rules for recording in Play and protect the shared editor and player saves. If you see a bug during capture, record the build, clip, and reproduction path for a separate regression check.
 - **Change no game file to make a shot.** Shots are scripts run through the editor bridge (`script eval_file`), so nothing goes into `Assets/`. When the game needs help (a field that opens only near the hero, a tile that loads later), drive it through its own public functions and its own numbers, for the recording only.
 - The usual editor rules hold: `guard` before entering Play, take `editor.lock`, batches with a deadline, then leave Play, hand the editor back and drop the lock (`references/editor-safety.md`).
 - Undo what the recording wrote: player preferences set by key presses (hints seen, settings), global shader values, `Time.captureFramerate`, input settings.

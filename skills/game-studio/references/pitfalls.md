@@ -2,6 +2,8 @@
 
 Each lesson is a real incident from a 15-day multi-agent build. Format: **symptom → root cause → fix → rule**. Ranked by time lost × how likely it is to happen to you. Read the top ten before starting; search the rest when something smells familiar.
 
+Historical incidents and responses from The Yellow Brick Road. Use them to diagnose similar symptoms. Apply active rules from the current project.
+
 ## The shared editor and the build
 
 **1. Two days of patching gaits.** Feet turned in, shins bent, characters sank and floated; each report got a local patch (lift the body, flip IK). → Every Mixamo clip had built its own Humanoid avatar from a bent-knee first frame. → One T-pose reference avatar; every clip copies it; delete all height patches; a diagnostic measures knee angle and symmetry for every character. → **When several characters share a defect, stop patching characters and find the shared layer. Define acceptance as measured numbers.**

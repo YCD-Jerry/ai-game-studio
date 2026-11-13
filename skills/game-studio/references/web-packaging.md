@@ -106,7 +106,7 @@ The director's report: "the pit in front of her is a flat green plane, the brick
 - **The real cause.** Scene generators wrote their meshes into a `.asset` afresh on every rebuild, with new fileIDs. Rebuilt scenes were committed **without** those `.asset` files. The editor read the working copy and looked fine. The build checkout was made from git, so its scenes pointed at sub-objects that did not exist: holes, missing road ends, whole rows of trees.
 - **The fixes, in layers:**
   1. Commit the missing assets.
-  2. Add `scripts/refcheck.py` (every scene reference into a text asset must resolve in HEAD; `--work` checks the working copy before committing), run before every build.
+  2. Add `scripts/refcheck.py` (checks direct scene references against HEAD; `--work` checks the working tree before committing), run before every build.
   3. Make the generators overwrite existing meshes in place, so fileIDs stay stable across rebuilds.
   4. Add the rule "a rebuilt scene is committed together with its generated assets".
 - **Rule:** when a build differs from the editor, first compare what the build was made from (git) with what the editor shows (the working copy), before suspecting the platform.

@@ -2,6 +2,8 @@
 
 Read this when planning the game, starting a chapter, running look passes, handling playtest feedback, or leaving the team to work overnight. Templates: `templates/PRD.md`, `templates/chapter.md`, `templates/backlog.md`, `templates/morning-report.md`, `templates/night-plan.md`.
 
+This is a worked production loop for a story-driven 3D project. Use the parts that serve the current slice. The named paths, review milestones, tool choices and storybook style are examples. The current project's rules and [verification plan](verification.md) govern execution.
+
 ## Contents
 1. Before any code: PRD, style, team brief
 2. A chapter, start to finish
@@ -15,8 +17,8 @@ Read this when planning the game, starting a chapter, running look passes, handl
 
 1. **PRD** (`templates/PRD.md`): one line, theme, pillars, scope, the source/IP boundary as a "may use / may not use" table, controls (one interact key everywhere), core systems, chapter list. Keep it short at first; the template marks the sections the source project only discovered it needed after playtests (companion rules, pacing rules, a link to the quality bar). Add them up front.
 2. **Style choice**: the same three scenes (an exterior, an interior, the hero with a companion) in two candidate styles from the image AI; the director picks; the chosen style becomes a paste-in English prompt block in `STYLE_GUIDE.md`, plus one block per main character.
-3. **Team brief** (`templates/TEAM.md`) and **`CLAUDE.md`** (`templates/CLAUDE.md`): every AI reads them first. Rules go in with the incident that caused them.
-4. **Backup**: a GitHub repo from the first hour; push after every commit; a `docs/RECOVERY.md` describing how to resume on a new machine or account.
+3. **Team brief** (`templates/TEAM.md`) and **`CLAUDE.md`** (`templates/CLAUDE.md`): are examples for a multi-session project. Link the active rules and keep incidents in the archive.
+4. **Backup**: use the project's backup and Git workflow. Record how to resume on a new machine or account.
 
 ## 2. A chapter, start to finish
 
@@ -57,7 +59,7 @@ Default look direction that worked for a storybook world: bright, saturated, har
 
 ## 5. The playtest loop
 
-The director does all playtesting. Sessions never drive Play mode in the shared editor (`references/editor-safety.md`).
+Keep human playtests for experience and creative sign-off. Run reproducible smoke checks in an isolated environment permitted by the project. Follow [editor safety](editor-safety.md) for a shared editor.
 
 **Capture.** The director plays and talks; the commander (or the slice session) writes `docs/backlog/YYYY-MM-DD-playtest.md` on the spot:
 - Director decisions first, numbered `D-1…`, verbatim, outranking older rules; copied to the decision log.
@@ -66,7 +68,7 @@ The director does all playtesting. Sessions never drive Play mode in the shared 
 
 **Fix.** Each owner fixes, verifies by compile + data checks + edit-mode shots, commits by path with the item number first (`N-215: …`) and `Colliders: …` last, and marks the item `→ done <commit> (awaiting playtest)` or `→ not done: <reason>`.
 
-**Report.** Before the next playtest the director gets a short list: what changed, where to look, what is unverified. Nothing is "done" until the director has played it.
+**Report.** Before the next playtest the director gets a short list: what changed, where to look, what is unverified. Track implementation, runtime checks, and human acceptance separately.
 
 **Learn.** A complaint the director makes a second time is the team's failure: find the root cause, fix it game-wide, add it to the quality bar's "reported more than once" table with its root cause, and add a check that prevents it. Track per round: how many findings a checklist or robot should have caught, how many deliveries bounced, time from feedback to fix. In one 36-item round, about two-thirds should never have reached the director.
 
@@ -75,15 +77,15 @@ The director does all playtesting. Sessions never drive Play mode in the shared 
 The director can leave the team working while asleep. Leave (`templates/night-plan.md`):
 1. A written plan or feedback list in the repo, in priority order, with the director's words quoted.
 2. Who does what: commander (dispatch, review, morning report, devlog) and each session's scope.
-3. Standing limits restated: no Play mode; guard before compile/rebuild/import; one editor via the lock; shared files only with the commander's say-so; no long exclusive jobs (a 15-minute web build) that block the shared editor; commit and push every step.
+3. Standing limits restated: for a live shared editor, use the guard and lock, keep exclusive jobs bounded, and follow ownership and Git rules. For isolated runtime checks, use the project's test plan.
 4. Logins done and the spending stance stated.
 
-During the night: the commander checks on a timer (every 30–60 min, e.g. Claude Code's `/loop` or a scheduled task; both belong to the session, so recreate them after a restart); when work runs out, start the next useful thing. **Never wait for an answer**: take the most reasonable default, write it in `morning-questions.md` with the cost to change it, and continue. Expect quota stops; if every step was committed and plans live in files, nothing is lost.
+During the night: the commander checks on a timer (every 30–60 min, e.g. Claude Code's `/loop` or a scheduled task; both belong to the session, so recreate them after a restart); when work runs out, start the next useful thing. Use reversible defaults within the agreed scope and log them. Leave material decisions pending and continue independent work. Expect quota stops; if every step was committed and plans live in files, nothing is lost.
 
 In the morning: a report (done table with commits, "not verified: play these, here's where", decisions needed with a recommendation, incidents), the questions file, the devlog, and updated backlog statuses.
 
 ## 7. Daily rhythm
 
-- At least one commit and push per day; in practice, push after every commit.
+- Keep recoverable checkpoints using the project's Git and backup workflow.
 - One devlog entry per day (`templates/devlog.md`): what happened, detours, what was learned, key commits. Honest, mistakes included. It becomes the public story of the project and the raw material for the launch (see `references/shipping.md`).
 - Every decision goes into `TEAM.md`'s decision log with the director's words and what it replaces. Chat is lost; files are not.

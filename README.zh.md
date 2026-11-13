@@ -1,6 +1,6 @@
 # game-studio · 一人 + AI 团队做 3D 网页游戏
 
-**让一组 Claude Code 会话像游戏工作室一样协作，做出一款能在浏览器里玩的 3D 游戏。**
+**规划、制作和验证一段可玩的游戏。从单会话开始，任务适合并行时再引入分工。**
 
 一个人当导演；一个“总指挥”会话负责派活和审核；工人会话各管一章或一个系统；图像 AI 画概念图，AI 3D 工具做角色，Blender 脚本做建筑，Unity（URP、WebGPU）组装成游戏。这个 skill 是整套打法：分工、规矩、模板、脚本，以及教会我们这些规矩的 30 个错误。
 
@@ -21,46 +21,30 @@
 
 ## 里面有什么
 
-- `SKILL.md`：一页说完：角色、每章的生产循环、16 条硬规矩、阅读指南。
-- `references/`：15 份参考：团队分工、生产循环、质量线、排版与界面（导演的对齐审美和拖拽排版工具）、美术流水线、角色、建筑道具、Unity 架构、编辑器安全、35 条踩坑、黑客松一日计划、发布、网页按章加载（先实测再拆包，网页和编辑器不一样时怎么查）、展示片（从运行中的游戏逐帧录制、穿越机镜头、卡小节剪辑、导出核验）、案例。
+- `SKILL.md`：入口包含规则优先级、制作与验证流程，以及按任务读取的参考文件。
+- `references/`：参考文件覆盖项目配置、验证、团队分工、生产循环、质量线、排版与界面（导演的对齐审美和拖拽排版工具）、美术流水线、角色、建筑道具、Unity 架构、编辑器安全、35 条踩坑、黑客松一日计划、发布、网页按章加载（先实测再拆包，网页和编辑器不一样时怎么查）、展示片（从运行中的游戏逐帧录制、穿越机镜头、卡小节剪辑、导出核验）、案例。
 - `templates/`：每个会话的开场消息、CLAUDE.md、TEAM.md、PRD、章节剧本、任务书、试玩反馈、晨报、夜间计划、开发日志、恢复文档、美术任务板，以及 11 段图像和审图提示词。
 - `assets/unity/`：可以直接拷进项目的 C# 起点（已对照 Unity 6 编译通过）：代码生成场景、剧情导演、TSV 本地化、交互键、手持道具挂点、运行时 NavMesh、审图机位截图、编辑器状态信标、一键网页构建。
 - `scripts/`：守卫脚本、编辑器锁、Play 状态探针、交还编辑器、一轮完整的编辑器作业（带总期限）、对话框看门狗、断引用检查（构建前场景引用的生成资产必须在 git 里存在）、裁切对照图、展示片工具（`scripts/showreel/`：Play 里逐帧存图、示例镜头、剪成中间片、样张、音乐对位核验、私人信息扫描），以及一个 Claude Code 钩子：导演在 Play 时，任何会话往 Assets 写文件都会被直接拦下。
 
 ## 安装
 
-在 Claude Code 里作为插件安装：
+从本仓库的工作副本复制整个 [game-studio 目录](skills/game-studio/) 到项目下：
 
-```
-/plugin marketplace add ycdjry/ai-game-studio
-/plugin install game-studio@ai-game-studio
-```
+| 工具 | 安装位置 |
+|---|---|
+| Codex | `.agents/skills/game-studio/` |
+| Claude Code | `.claude/skills/game-studio/` |
 
-或者直接复制 skill 文件夹（二选一，别两种都装）：
+复制后，`SKILL.md` 应和 `references/`、`scripts/` 同级。在该项目里打开工具，Codex 用 `$game-studio`，Claude Code 用 `/game-studio`。安装位置见 [Codex 文档](https://developers.openai.com/codex/skills/)和 [Claude Code 文档](https://code.claude.com/docs/en/skills)。
 
-```bash
-git clone https://github.com/ycdjry/ai-game-studio
-cp -r ai-game-studio/skills/game-studio ~/.claude/skills/
-```
+## 先用一个任务试试
 
-## 怎么用
+> 用 game-studio 复现一扇只有读档后才打不开的门。在独立工作副本里跑项目已有的冒烟测试，说明哪些通过了，哪些还需要真人试玩。
 
-直接描述你想做的游戏就行，例如：
+从 [SKILL.md](skills/game-studio/SKILL.md) 开始。[项目配置指南](skills/game-studio/references/project-setup.md)说明当前决定、引擎设置和画风放在哪里。[验证指南](skills/game-studio/references/verification.md)说明怎样用引用扫描、同机位截图、运行时检查和试玩取得证据。Unity 工具按需使用。运行时测试依赖项目自己的场景、测试数据和断言。
 
-- 「把《彼得·潘》做成一个能在浏览器里玩的小型 3D 探索游戏。」
-- 「给我的 Unity 游戏搭一个 Claude 团队：每关一个会话，美术一个。」
-- 「明天黑客松，8 个小时，我想做一个好看、能玩的 3D 场景。」
-- 「两个会话在同一个 Unity 项目里老是把对方的编译搞坏。」
-
-完整项目从 `SKILL.md` 的 “Start a project” 开始；一天的比赛看 `references/hackathon.md`。
-
-## 需要什么
-
-- Claude Code（最好能同时开几个会话）。
-- Unity 6（带 Web Build Support），以及会话能调用的 Unity 命令行（`unity command ...`）或 MCP。没有命令行时，守卫可以改用“信标模式”。
-- Python 3（给拦截钩子用，可选但推荐）。
-- Blender 4 以上（无头脚本）。
-- 一个图像模型（比如 Codex 里的 GPT 图像）和一个 AI 3D 工具（比如 Tripo），账号由你自己掌握。Claude 从不登录、不付费，这些都由你来做。
+在仓库根目录运行 `python -B -m unittest discover -s tests -v` 可以复测引用检查器。需要 Python 和 Git。
 
 ## 致谢
 

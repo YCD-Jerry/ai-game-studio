@@ -1,4 +1,6 @@
-# <Project> — notes for Claude
+# <Project> — agent instructions
+
+Adapt for CLAUDE.md or AGENTS.md. Keep only the project's active rules and link their owning documents. The paths and workflows below are examples.
 
 <One paragraph: what the game is, engine and target (e.g. Unity 6 URP, WebGPU web build), the source and what is off-limits (e.g. "the 1900 book, never the 1939 film").> Reply to the director in <language>.
 
@@ -13,7 +15,7 @@
 - Editor helper scripts (guard, lock, hand back, shots): `<tools dir>` (outside `Assets/`).
 
 ## Working with the director
-- **The director does all testing.** Don't enter or drive Play mode. Compile checks, data checks (eval scripts reading the scene) and edit-mode screenshots for looks are fine. Write, check, commit, push, then say exactly what to look at and what is not verified.
+- **Verification:** <static commands, visual capture, isolated runtime test location, human acceptance owner>. Record results and outstanding checks.
 - **Never change the project while the director plays.** Run `guard` before any recompile, rebuild, reimport or write into `Assets/`; exit 3 means playing: do other work and come back. Stage new scripts in your own folder outside `Assets/` and move them in together.
 - **One editor**: only <custodian session> starts it; take `editor.lock`; save all and run `hand_back` when done.
 - **Never take the camera away.** Story beats may hold the character still; the player can always look around. Lines spoken while the player can walk advance by themselves.
@@ -26,7 +28,7 @@
 - **Three tries without improvement: stop**, report numbers to the commander, change approach.
 
 ## Git
-- Only Claude runs git. Commit by path (shared index): `git commit -m "<msg>" -- <paths>`. Push after every commit. Nothing over 50 MB.
+- <Git owner, commit and push policy, asset limits and backup location>.
 - Message: item number first (`N-12: …`), `Colliders: …` last.
 - Daily devlog `docs/devlog/YYYY-MM-DD.md` (honest, mistakes included), written by the commander each evening.
-- GitHub is the only backup: every decision and workflow lives in the repo, never only in chat.
+- Record decisions and recovery steps in their owning project documents.

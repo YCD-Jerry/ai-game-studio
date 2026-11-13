@@ -2,6 +2,8 @@
 
 Read this when setting up the team, adding a session, writing a brief, or deciding where a piece of work belongs. Templates: `templates/TEAM.md`, `templates/brief.md`.
 
+Use this example when the project authorizes parallel work. Assign only the roles and file boundaries the task needs. A single session can own implementation and integration. The original team's staffing, models and communication tools are examples.
+
 ## Contents
 1. The cast
 2. How the structure grew (and why each change happened)
@@ -14,7 +16,7 @@ Read this when setting up the team, adding a session, writing a brief, or decidi
 
 | Role | Who | Owns (writes) | Never does |
 |---|---|---|---|
-| **Director** | The one human | Direction, every creative call, all playtesting, logins, purchases, paid generations, merging | Writes code |
+| **Director** | The one human | Direction, every creative call, human playtesting, logins, purchases, paid generations, merging | Writes code |
 | **Commander** | One Claude session, the strongest model, used sparingly | Decision log, backlog, briefs, image-AI orders, morning report, devlog, `CLAUDE.md`, shared-file assignments | Hands-on building; playtesting |
 | **Slice session** (one per chapter/level, or a short-lived ticket session) | Claude, strong model, high effort | Its slice: builder, props, story director, text table, chapter docs, review folders | Edits shared scripts without an order; starts the editor; reimports characters |
 | **Systems owner** | Claude | Cross-cutting code: player, camera, HUD, story director, terrain/roads, followers, menus, saves | Slice files |
@@ -48,7 +50,7 @@ The lesson in that history: **own files by slice early, but give cross-cutting s
 - Shared files are assigned by the commander before anyone edits them. A slice needing a shared change asks the commander, who dispatches it to the owner.
 - Numbered resources (art IDs, sound IDs, feedback numbers) are handed out by their owner, never self-assigned: one brief claimed sound IDs that collided with another chapter's, and they had to be voided and reissued.
 - Every new AI adds a row to the role table in `TEAM.md` and posts an intro saying which files it will change.
-- Only Claude runs git. Only the art pipeline uses the browser where paid tools are logged in, and only after the director released the spend.
+- Use the project's Git workflow and access boundaries. Assign an owner for paid asset orders and operate within the user's authorization.
 - Two sessions that might write the same file never run at the same time. If they must, give one a separate worktree.
 
 ## 4. How orders and deliveries flow
@@ -69,7 +71,7 @@ The lesson in that history: **own files by slice early, but give cross-cutting s
 
 Budget model tiers like staff: **the scarce one decides, the plentiful ones build.** In the source project the strongest model burned quota fast in hands-on work, so it became the commander only (review, dispatch, decisions, the devlog), and every hands-on session ran a strong mid-tier model at high effort. A cheap model kept the editor and did small shared UI.
 
-Design for interruption: quota stops, context compaction and crashes will happen. Every step is committed and pushed; every plan, decision and status lives in a file; a session resumes by reading `CLAUDE.md` → `TEAM.md` → its brief → the backlog.
+Design for interruption: quota stops, context compaction and crashes will happen. Keep a recoverable checkpoint and record material decisions and status. A session resumes from the project's active instructions, its brief, and the current handoff.
 
 ## 6. When to split, when to stop splitting
 

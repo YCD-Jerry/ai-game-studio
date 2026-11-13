@@ -1,10 +1,19 @@
 {
   "name": "game-studio",
-  "description": "Run a studio of Claude Code sessions that builds a 3D web game: one human director, a commander session, worker sessions, an image AI, Tripo, Blender and Unity. Distilled from The Yellow Brick Road.",
-  "version": "1.0.0",
-  "author": { "name": "ycdjry", "url": "https://github.com/ycdjry" },
-  "homepage": "https://github.com/ycdjry/ai-game-studio",
-  "repository": "https://github.com/ycdjry/ai-game-studio",
+  "description": "Plan, build, and verify playable game slices, with optional Unity tools and multi-session coordination.",
+  "version": "1.1.0",
+  "author": {
+    "name": "ycdjry",
+    "url": "https://github.com/ycdjry"
+  },
   "license": "MIT",
-  "keywords": ["game-dev", "unity", "webgpu", "tripo", "blender", "multi-agent", "3d"]
+  "keywords": [
+    "game-dev",
+    "unity",
+    "webgpu",
+    "tripo",
+    "blender",
+    "multi-agent",
+    "3d"
+  ]
 }
