@@ -1,0 +1,10 @@
+/Library/
+/Logs/
+/Temp/
+/UserSettings/
+/obj/
+/.vs/
+/*.csproj
+/*.sln
+/*.slnx
+/test-results*.xml

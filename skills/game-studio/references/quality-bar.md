@@ -1,6 +1,6 @@
-# Quality bar: self-review before the director sees anything
+# Storybook quality bar: The Yellow Brick Road
 
-Use the relevant checks for the requested change. Sections 2–7 preserve The Yellow Brick Road's storybook acceptance bar as a worked example. Select and adapt criteria to the current project's goals, mechanics, target devices and style. For evidence and automation see [Verification](verification.md).
+This worked example records The Yellow Brick Road's acceptance criteria. Use the relevant checks for the requested change. Choose other criteria from the [genre profiles](genre-profiles.md) when the current project's goals, mechanics, target devices or style differ. For evidence and automation see [Verification](verification.md).
 
 ## Contents
 1. How to use it

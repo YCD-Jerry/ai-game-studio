@@ -1,76 +1,43 @@
 # game-studio
 
-**Plan, build, and verify playable game slices. Start with one session and add coordination only when the work benefits from it.**
-
-One human directs. A commander session dispatches and reviews. Worker sessions own chapters and systems. An image AI paints, an AI-3D tool makes characters, Blender scripts make buildings, Unity (URP, WebGPU) puts it together. This skill is the playbook: the roles, the rules, the templates, the scripts and the 30 mistakes that taught them.
+An AI skill for planning, building, and verifying playable game slices. It starts with the player outcome and works through the game's existing entry points. Use one session by default and add coordination when the work can be owned independently.
 
 [中文说明](README.zh.md)
 
-## Where it comes from
+## Install the skill
 
-Distilled from *The Yellow Brick Road*, a 3D storybook web game of L. Frank Baum's 1900 *Wonderful Wizard of Oz* (the book, not the film: silver shoes, not ruby slippers):
+Copy the entire [game-studio folder](skills/game-studio/) from this checkout into the target game's skill directory. Open the host in that game project and invoke the skill.
 
-| | |
-|---|---|
-| Time | 15 days |
-| Team | 1 human director, ~20 Claude Code sessions (up to ~8 at once), an image AI, Tripo, Blender |
-| Output | 9 chapters, 17 code-generated scenes, ~72k lines of C#, ~40k lines of Blender Python |
-| Process | 1,325 commits, 356 image orders, 256 numbered playtest notes over 13 rounds, 16 daily devlog entries |
+| Host | Project-level destination | Invoke |
+|---|---|---|
+| Codex | `.agents/skills/game-studio/` | `$game-studio` |
+| Claude Code | `.claude/skills/game-studio/` | `/game-studio` |
 
-The interesting part is not the speed but the organisation: a team brief every AI reads first, one owner per file, a single shared editor guarded by a lock, scenes built from code, a numbered playtest backlog in the director's own words, and a rule book that grew out of every expensive mistake.
-
-## What's inside
-
-```
-skills/game-studio/
-├── SKILL.md                    rule precedence, slice workflow, and task-specific references
-├── references/
-│   ├── studio-roles.md         who does what, file ownership, how orders flow, model tiers
-│   ├── production-loop.md      PRD → chapter → graybox → look passes → playtest loop → overnight runs
-│   ├── quality-bar.md          12 principles, checklists marked [data]/[image]/[play], when to stop
-│   ├── layout-and-ui.md        the director's eye for alignment, and a drag-and-drop layout tool
-│   ├── art-pipeline.md         overview sheets, asset breakdown, screenshot-first image orders, reviews
-│   ├── characters.md           turnaround → Tripo → six-angle check → rig → Mixamo → a normal walk
-│   ├── props-and-buildings.md  Blender from code, in parts, QA gates, Blender↔Unity traps
-│   ├── unity-architecture.md   builders, story director, camera, colliders, localization, web build
-│   ├── editor-safety.md        many sessions, one editor: guard, lock, rounds, honest checks
-│   ├── pitfalls.md             35 lessons: symptom → root cause → fix → rule
-│   ├── hackathon.md            one scene in a day with three sessions
-│   ├── shipping.md             web build, the 60-second video, launch, opening the source safely
-│   ├── web-packaging.md        loading chapter by chapter, measured first; when the web build differs from the editor
-│   ├── showreel.md             the launch film from the running game: capture, drone shots, cuts on the bar
-│   └── case-study.md           the project in numbers, what worked, what slowed it down
-├── templates/                  kickoff messages, CLAUDE.md, TEAM.md, PRD, chapter, brief, backlog,
-│                               morning report, night plan, devlog, recovery, art board, 11 prompts
-├── assets/unity/               C# starting points (compile against Unity 6):
-│                               scene builder, story director, TSV localization, interact key,
-│                               grip socket, runtime NavMesh, review shots, editor state beacon, web build
-└── scripts/                    guard, lock, play-state probe, hand back, a full editor round,
-                                a dialog watcher, a reference check before builds,
-                                a crop sheet, showreel/ (frame capture in Play,
-                                cuts and checks), and a Claude Code hook that blocks writes into
-                                Assets/ while Unity is playing
-```
-
-## Install
-
-From a checkout of this repository, copy the entire [game-studio folder](skills/game-studio/) into your project's skill directory:
-
-| Host | Destination |
-|---|---|
-| Codex | `.agents/skills/game-studio/` |
-| Claude Code | `.claude/skills/game-studio/` |
-
-The destination should contain `SKILL.md` alongside `references/` and `scripts/`. Open the host in that project and invoke `$game-studio` in Codex or `/game-studio` in Claude Code. The project-level paths are documented by [Codex](https://developers.openai.com/codex/skills/) and [Claude Code](https://code.claude.com/docs/en/skills).
+Keep `SKILL.md`, `references/`, `templates/`, `assets/`, and `scripts/` together. See the installation paths in the [Codex skill docs](https://developers.openai.com/codex/skills/) and [Claude Code skill docs](https://code.claude.com/docs/en/skills).
 
 ## Try it on one task
 
-> Use game-studio to reproduce a door that fails after loading a save. Use the existing smoke test in an isolated checkout and report what passed and what needs a human playtest.
+> Use game-studio to reproduce a door that fails after loading a save. Use the project's normal entry point in an isolated checkout. Show the failing case, fix it, and rerun that case and the normal path.
 
-Start with [SKILL.md](skills/game-studio/SKILL.md). The [project setup guide](skills/game-studio/references/project-setup.md) shows where to keep current decisions, engine settings, and art direction. The [verification guide](skills/game-studio/references/verification.md) covers reference scans, matched captures, runtime checks and playtests. Unity helpers are optional and have their own prerequisites. Runtime tests use the project's own scene, fixtures and assertions.
+The [skill entry point](skills/game-studio/SKILL.md) links to [project setup](skills/game-studio/references/project-setup.md), [genre profiles](skills/game-studio/references/genre-profiles.md), and [verification](skills/game-studio/references/verification.md). The profiles give example acceptance paths for narrative, action, strategy, and competitive games. The project supplies its controls, engine settings, acceptance criteria, and test commands.
 
-To run the bundled reference checker's regression tests, use `python -B -m unittest discover -s tests -v` from the repository root with Python and Git installed.
+## Optional Unity tools
 
-## Credits
+The [Unity adapter](skills/game-studio/references/unity-adapter.md) covers generated scenes, reference scans, isolated PlayMode checks, and working with a live shared editor. For the shared editor workflow, start with [editor safety](skills/game-studio/references/editor-safety.md). To install the guard tools and editor beacon into a target project, close its Unity editor first, then run these commands from this repository with Python 3.10 or later.
 
-Inspired by Sac's *The Little Prince: Among the Stars* ([littleprince.dev](https://littleprince.dev)) and his public write-up of building it with Opus, Tripo, Blender and Unity. Made by @雷霆俊叶 [@ycdjry](https://github.com/ycdjry) with Claude.
+```sh
+python skills/game-studio/scripts/setup_unity.py install --project /path/to/game --editor-closed
+python skills/game-studio/scripts/setup_unity.py doctor --project /path/to/game
+```
+
+Run `doctor` again with the target editor open to check the live probe. The optional host hook covers specific tool calls. The shared editor guard and project workflow cover the operation as a whole.
+
+The [Unity key-and-door example](examples/unity-key-door/README.md) shows a PlayMode check that enters a playable scene, uses the key, saves, reloads, and finishes the objective. Follow its instructions to run it separately from your own game. Run the repository's Python tests with `python -B -m unittest discover -s tests -v` from the root with Python and Git available.
+
+The [benchmark protocol](benchmarks/README.md) defines a comparison with a no-skill baseline and the previous skill revision.
+
+## Where it comes from
+
+The skill grew from *The Yellow Brick Road*, a 3D storybook web game adapting L. Frank Baum's 1900 *The Wonderful Wizard of Oz*. Its 15 days of active development produced nine playable chapters and 13 rounds of playtest notes. The [case study](skills/game-studio/references/case-study.md) describes the workflow. The [pitfalls](skills/game-studio/references/pitfalls.md) document what broke, why, and which checks helped.
+
+Created by Jerry [@ycdjry](https://github.com/ycdjry). Inspired by Sac's *The Little Prince: Among the Stars* and its public production write-up. [Project site](https://littleprince.dev)

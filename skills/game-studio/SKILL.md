@@ -1,12 +1,12 @@
 ---
 name: game-studio
-description: Plan, build, review, and verify playable game slices, levels, and asset integrations. Use for turning a game idea or story into a vertical slice, checking gameplay or visuals against a quality bar, investigating a game regression, or coordinating authorized game-development work across agents. Includes optional Unity scene, editor, and web-build tools.
+description: Plan, build, review, and verify playable game slices, levels, and asset integrations. Use to turn an idea into a playable loop, fix a gameplay regression, or review a slice against its project goals. Includes optional Unity workflows and genre-specific examples.
 license: MIT
 ---
 
 # Game Studio
 
-Use the smallest workflow that can produce and verify the requested change. Start from the existing project and its normal player entry point. For a new game, pick one playable loop or story beat and define how the player enters it, acts, receives feedback, and reaches an outcome.
+Start from the project's normal player entry point and use the smallest workflow that can verify the requested change. For a new game, pick one playable loop and define how the player enters it, acts, receives feedback, and reaches an outcome.
 
 ## Resolve project rules once
 
@@ -25,14 +25,12 @@ Use the smallest workflow that can produce and verify the requested change. Star
 
 | Task | Read or use |
 |---|---|
-| Define a slice or run a look pass | [Production loop](references/production-loop.md), [chapter brief](templates/chapter.md) |
-| Verify a change, choose checks, or set up repeatable Unity runs | [Verification](references/verification.md) |
-| Set acceptance criteria or review a storybook slice | [Quality bar example](references/quality-bar.md) |
+| Define a slice in a new project | [Project setup](references/project-setup.md), [game brief](templates/PRD.md) |
+| Choose checks or diagnose a regression | [Verification](references/verification.md) |
+| Set acceptance criteria for a narrative, action, strategy, or competitive loop | [Genre profiles](references/genre-profiles.md) |
+| Use Unity scene tools, a shared Unity editor, or a Unity web build | [Unity adapter](references/unity-adapter.md) |
 | Coordinate authorized parallel work | [Studio roles](references/studio-roles.md), [work brief](templates/brief.md) |
-| Modify a live shared Unity editor | [Editor safety](references/editor-safety.md), including guard, lock, and deadlines |
-| Work with Unity generators, narrative, camera, or localization | [Unity architecture](references/unity-architecture.md) and the relevant starters in `assets/unity/` |
 | Order or review art | [Art pipeline](references/art-pipeline.md), [characters](references/characters.md), [props](references/props-and-buildings.md), or [layout](references/layout-and-ui.md) |
-| Check Unity scene references before a build | [Web packaging](references/web-packaging.md) and `scripts/refcheck.py` |
 | Prepare a release, trailer, or jam plan | [Shipping](references/shipping.md), [showreel](references/showreel.md), or [game jam](references/hackathon.md) |
 | Investigate a recurring problem or study the source project | [Pitfalls](references/pitfalls.md), [Yellow Brick Road case study](references/case-study.md) |
 

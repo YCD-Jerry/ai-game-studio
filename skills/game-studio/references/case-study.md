@@ -4,13 +4,13 @@ The project this skill was distilled from. Use it to calibrate expectations (wha
 
 ## In one paragraph
 
-One human director, writing no code by hand, built a 3D storybook web game adapting L. Frank Baum's 1900 novel *The Wonderful Wizard of Oz* (the book, never the 1939 film: silver shoes, not ruby slippers) in Unity 6 URP for WebGPU, in 17 calendar days (2026-10-23 → 11-08). About 20 named Claude Code sessions worked on it over its life, up to ~8 at once, with an image AI for concepts, narration pages and lettering, Tripo for characters, and Blender driven headless by Python. The interesting part is not the speed but the organisation: a team brief every AI reads first, file ownership per session, a single-editor lock, code-generated scenes, a numbered playtest backlog in the director's own words, and a rule book that grew from every expensive mistake.
+Jerry, a human director who wrote no code by hand, built a 3D storybook web game adapting L. Frank Baum's 1900 novel *The Wonderful Wizard of Oz* in Unity 6 URP for WebGPU over 15 days of active development. About 20 named Claude Code sessions worked on it over its life, up to ~8 at once, with an image AI for concepts, narration pages and lettering, Tripo for characters, and Blender driven headless by Python. The team brief, file ownership, shared-editor coordination, generated scenes, and numbered playtest backlog are documented in the [production loop](production-loop.md) and [storybook quality bar](quality-bar.md).
 
 ## Numbers (counted from the repository on 2026-11-08)
 
 | Item | Count |
 |---|---|
-| Calendar days | 17 |
+| Active development days | 15 |
 | Commits | 1,325 (busiest day 237) |
 | Chapters | 9 (prologue + 8), playable end to end from the menu |
 | Claude sessions | ~20 named, up to ~8 concurrent |
@@ -28,11 +28,11 @@ Honest caveats: most late changes were checked only by data and screenshots and 
 
 ## Five phases
 
-1. **Foundations (days 1–5)**: PRD, style choice, the team brief, code-generated scenes, the first Tripo characters, prologue to chapter 2 as graybox.
-2. **The big night (day 6, ~160 commits)**: an approved overnight plan took chapters 4–6 to playable graybox while the director slept; the gait root cause was found; work was reorganised into one session per chapter; four chapters were stitched into one streamed world.
-3. **Repair loops (days 7–10)**: playtest → fix on the shared world; forest, grass, clouds; the one-editor rule.
-4. **Quality turn (days 11–13)**: the triangle budget cancelled ("quality first"), numbered feedback lists, a written quality bar, a story-text editor for the director, a dedicated Blender modelling session, "every image starts from a game screenshot".
-5. **Sprint (days 14–17)**: three to five playtest rounds a day; chapters 7 and 8 built and reworked.
+1. **Foundations** — PRD, style choice, team brief, generated scenes, first Tripo characters, and grayboxes for the prologue through chapter 2.
+2. **Overnight build (~160 commits)** — An approved overnight plan brought chapters 4–6 to playable graybox. The team found the gait root cause, assigned one session per chapter, and stitched four chapters into one streamed world.
+3. **Repair loops** — Playtests and fixes on the shared world, environment work on forest, grass and clouds, and the one-editor rule.
+4. **Quality turn** — Numbered feedback, written quality criteria, a story-text editor, a dedicated Blender modelling session, and image briefs based on gameplay screenshots.
+5. **Final sprint** — Three to five playtest rounds a day while the team built and reworked chapters 7 and 8.
 
 ## What made it work
 

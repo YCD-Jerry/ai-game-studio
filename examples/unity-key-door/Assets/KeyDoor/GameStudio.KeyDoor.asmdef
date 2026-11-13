@@ -1,0 +1,4 @@
+{
+  "name": "GameStudio.KeyDoor",
+  "references": ["Unity.InputSystem"]
+}

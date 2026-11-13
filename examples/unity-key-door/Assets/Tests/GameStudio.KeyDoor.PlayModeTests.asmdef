@@ -1,0 +1,5 @@
+{
+  "name": "GameStudio.KeyDoor.PlayModeTests",
+  "references": ["GameStudio.KeyDoor", "Unity.InputSystem"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

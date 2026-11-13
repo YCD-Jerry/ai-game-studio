@@ -32,7 +32,8 @@ Parameters
   -ShotSpec     review_shots spec file (copied to <project>\Temp\game-studio\review_shots.txt); see review_shots.cs
   -ShotsEval    a custom shots eval instead of review_shots.cs (then PNG verification needs -ShotsOut)
   -ShotsOut     folder the PNGs land in (default: out= from the spec, else <project>\Temp\game-studio\shots)
-  -NoDialogWatch  do not start dialog_watch.ps1 (TryAgain) in the background
+  -DialogEditorPid  explicitly target one Unity process for the optional Windows TryAgain watcher
+  -NoDialogWatch    disable the watcher even when a PID was supplied
   -NoHandBack   skip hand_back.cs (not recommended: the next Play then waits behind big open scenes)
 
 Exit codes: 0 done | 1 lock not taken | 2 bad arguments | 3 guard refused mid-round (Play started) |
@@ -64,6 +65,7 @@ param(
     [string]$ShotSpec,
     [string]$ShotsEval,
     [string]$ShotsOut,
+    [int]$DialogEditorPid,
     [switch]$NoDialogWatch,
     [switch]$NoHandBack
 )
@@ -80,6 +82,7 @@ if (-not $EvalDir) { $EvalDir = $PSScriptRoot }
 foreach ($f in 'playing.cs', 'refresh.cs', 'hand_back.cs') { if (-not (Test-Path -LiteralPath (Join-Path $EvalDir $f))) { Quit 2 "bad arguments: $f missing in $EvalDir" } }
 if ($StageDir -and -not $AssetsDest) { Quit 2 "bad arguments: -StageDir needs -AssetsDest" }
 if ($AssetsDest -and -not ($AssetsDest -replace '\\', '/').StartsWith('Assets/')) { Quit 2 "bad arguments: -AssetsDest must start with Assets/" }
+if ($AssetsDest -and ($AssetsDest -split '[/\\]' -contains '..')) { Quit 2 "bad arguments: -AssetsDest may not traverse out of Assets/" }
 if ($StageDir -and -not (Test-Path -LiteralPath $StageDir)) { Quit 2 "bad arguments: no $StageDir" }
 if ($BuildMenu -and -not $BuiltMarker -and -not $BuiltScene) { Quit 2 "bad arguments: -BuildMenu needs -BuiltMarker and/or -BuiltScene (the menu reply is not proof)" }
 if ($ShotSpec -and -not (Test-Path -LiteralPath $ShotSpec)) { Quit 2 "bad arguments: no $ShotSpec" }
@@ -98,6 +101,10 @@ function Quote([string]$a) {
 }
 # Runs the unity CLI with a hard wall-clock limit; returns stdout+stderr as one string ("TIMEOUT ..." when killed).
 function UnityCli([string[]]$CliArgs, [int]$HardSec = 180) {
+    if ($script:deadline) {
+        $HardSec = [math]::Min($HardSec, [int][math]::Floor(($script:deadline - (Get-Date)).TotalSeconds))
+        if ($HardSec -lt 1) { throw 'Round deadline reached before Unity CLI call.' }
+    }
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = $unity
     $psi.Arguments = ($CliArgs | ForEach-Object { Quote $_ }) -join ' '
@@ -105,8 +112,16 @@ function UnityCli([string[]]$CliArgs, [int]$HardSec = 180) {
     foreach ($kv in @(@('UNITY_PROJECT_PATH', $ProjectPath), @('UNITY_NO_BANNER', '1'), @('UNITY_NO_PAGER', '1'), @('UNITY_NON_INTERACTIVE', '1'))) { $psi.EnvironmentVariables[$kv[0]] = $kv[1] }
     $p = [Diagnostics.Process]::Start($psi)
     $o = $p.StandardOutput.ReadToEndAsync(); $e = $p.StandardError.ReadToEndAsync()
-    if (-not $p.WaitForExit($HardSec * 1000)) { try { $p.Kill() } catch {}; return "TIMEOUT after $HardSec s: $($CliArgs -join ' ')" }
+    if (-not $p.WaitForExit($HardSec * 1000)) {
+        try { $p.Kill() } catch {}
+        $script:uncertain = $true
+        throw "Unity CLI exceeded ${HardSec}s. Editor work may still be running."
+    }
     $p.WaitForExit()
+    if ($p.ExitCode -ne 0) {
+        $script:uncertain = $true
+        throw "Unity CLI exited $($p.ExitCode): $(Short ($o.Result + $e.Result))"
+    }
     return ($o.Result + $e.Result)
 }
 function Eval([string]$file, [int]$sec = 300) {
@@ -117,22 +132,24 @@ function Short([string]$s, [int]$n = 400) { $t = ($s -replace '\s+', ' ').Trim()
 function Guard { $null = & (Join-Path $PSScriptRoot 'guard.ps1') -Owner $Owner -ProjectPath $ProjectPath -LockDir $LockDir -EvalDir $EvalDir; return $LASTEXITCODE }
 $script:deadline = $null
 $script:lost = $false   # set when someone else took the lock: then the editor is theirs, do not hand it back
+$script:uncertain = $false
 function Step([string]$name) {
     if ((Get-Date) -gt $script:deadline) { throw "DEADLINE before '$name'" }
-    $null = & (Join-Path $PSScriptRoot 'lock.ps1') -Action refresh -Owner $Owner -Note "$Note : $name" -ProjectPath $ProjectPath -LockDir $LockDir
+    $null = & (Join-Path $PSScriptRoot 'lock.ps1') -Action refresh -Owner $Owner -HolderPid $PID -Note "$Note : $name" -ProjectPath $ProjectPath -LockDir $LockDir
     if ($LASTEXITCODE -ne 0) { $script:lost = $true; throw "LOST LOCK before '$name'" }
     Say "== $name"
 }
-function SecondsLeft { [int][math]::Max(30, ($script:deadline - (Get-Date)).TotalSeconds) }
+function SecondsLeft { [int][math]::Max(0, [math]::Floor(($script:deadline - (Get-Date)).TotalSeconds)) }
 # Settled = not compiling, not importing, not playing, three polls in a row (5 s apart), bounded by the deadline.
 function Settle([int]$maxSec = 600) {
     $until = (Get-Date).AddSeconds([math]::Min($maxSec, (SecondsLeft)))
     $ok = 0; $r = ''
     while ((Get-Date) -lt $until -and $ok -lt 3) {
         Start-Sleep -Seconds 5
+        if ((Get-Date) -ge $until) { break }
         $r = Eval 'playing.cs' 60
         if ($r -match 'playing=True') { $script:code = 3; throw "PLAY STARTED while settling" }
-        if ($r -match 'compiling=False' -and $r -match 'updating=False') { $ok++ } else { $ok = 0 }
+        if ($r -match 'GAME_STUDIO_STATE playing=False paused=(?:True|False) compiling=False updating=False compileFailed=(?:True|False) scenes=\d+ dirty=(?:True|False) active=') { $ok++ } else { $ok = 0 }
     }
     if ($ok -lt 3) { $script:code = 14; throw "EDITOR NEVER SETTLED: $(Short $r 200)" }
     return $r
@@ -141,17 +158,16 @@ function Settle([int]$maxSec = 600) {
 # ---- 1. take the lock (holding nothing while waiting) ------------------------------------------------------
 $t0 = Get-Date
 Say "waiting for the editor (max $WaitMinutes min) as $Owner"
-& (Join-Path $PSScriptRoot 'lock.ps1') -Action take -Owner $Owner -Note $Note -WaitMinutes $WaitMinutes -ProjectPath $ProjectPath -LockDir $LockDir | ForEach-Object { Say $_ }
+& (Join-Path $PSScriptRoot 'lock.ps1') -Action take -Owner $Owner -HolderPid $PID -Note $Note -WaitMinutes $WaitMinutes -ProjectPath $ProjectPath -LockDir $LockDir | ForEach-Object { Say $_ }
 if ($LASTEXITCODE -ne 0) { Quit 1 "lock not taken" }
 $script:deadline = (Get-Date).AddMinutes($HoldMinutes)
 $script:code = 0
 $result = 'done'
 $watch = $null
-if (-not $NoDialogWatch -and $env:OS -eq 'Windows_NT') {
-    $watch = Start-Job -FilePath (Join-Path $PSScriptRoot 'dialog_watch.ps1') -ArgumentList 'TryAgain', ($HoldMinutes + 10)
-}
-
 try {
+    if ($DialogEditorPid -gt 0 -and -not $NoDialogWatch -and $env:OS -eq 'Windows_NT') {
+        $watch = Start-Job -FilePath (Join-Path $PSScriptRoot 'dialog_watch.ps1') -ArgumentList 'TryAgain', ($HoldMinutes + 10), 20, 6, $DialogEditorPid
+    }
     # ---- 2. bring files in (guard first: nothing lands in Assets/ during Play) ---------------------------------
     $broughtIn = 0
     if ($StageDir) {
@@ -165,6 +181,10 @@ try {
             if ($old -and $old.Length -eq $src.Length -and $old.LastWriteTime -eq $src.LastWriteTime) { continue }
             $copied = $false
             for ($t = 0; $t -lt 6 -and -not $copied; $t++) {
+                if ($t -gt 0) {
+                    Step 'copy retry'
+                    $g = Guard; if ($g -ne 0) { $script:code = 3; throw "guard said $g before copy retry" }
+                }
                 try { Copy-Item -LiteralPath $src.FullName -Destination $to -Force -ErrorAction Stop; $copied = $true }
                 catch { Say "copy retry $($src.Name): $($_.Exception.Message)"; Start-Sleep -Seconds 10 }
             }
@@ -225,6 +245,7 @@ try {
     # ---- 5. review shots, then check the files themselves --------------------------------------------------------
     if ($ShotSpec -or $ShotsEval) {
         Step 'shots'
+        $g = Guard; if ($g -ne 0) { $script:code = 3; throw "guard said $g before shots" }
         $shotStart = Get-Date
         $outDir = $ShotsOut
         if ($ShotSpec) {
@@ -255,14 +276,30 @@ catch {
     $result = "failed: " + $_.Exception.Message
 }
 finally {
-    # ---- 6. hand back (save + light scene), release, stop the watcher. Always, even after a failure or deadline.
-    if ($script:lost) { Say "lock lost: NOT handing back (another session holds the editor now; touching it would break their round)" }
-    elseif (-not $NoHandBack) {
-        $hb = Eval 'hand_back.cs' 300
-        Say ("hand back: " + (Short $hb 300))
-        if ($hb -notmatch '\bOK\b') { Say "WARNING: hand-back did not report OK: look at the editor (Untitled scene? modal dialog? dialog_watch.ps1 -Mode List)" }
+    # A CLI failure can leave an operation running in the editor. Retain the lock for recovery.
+    try {
+        if (-not $script:lost -and -not $script:uncertain -and -not $NoHandBack) {
+            $handBackGuard = Guard
+            if ($handBackGuard -eq 0) {
+                $hb = Eval 'hand_back.cs' 300
+                Say ("hand back: " + (Short $hb 300))
+                if ($hb -notmatch '\bOK\b') { throw 'hand-back did not report OK' }
+            } elseif ($handBackGuard -eq 3) {
+                Say 'hand-back skipped because Play started'
+            } else {
+                throw "guard blocked hand-back (exit $handBackGuard)"
+            }
+        }
+    } catch {
+        $script:uncertain = $true
+        Say ("hand-back failed: " + $_.Exception.Message)
+        if ($script:code -eq 0) { $script:code = 13; $result = "failed: " + $_.Exception.Message }
     }
-    & (Join-Path $PSScriptRoot 'lock.ps1') -Action release -Owner $Owner -ProjectPath $ProjectPath -LockDir $LockDir | ForEach-Object { Say $_ }
+    if ($script:uncertain) { Say 'lock retained: inspect Unity for unfinished work, then recover with editor_lock.py' }
+    elseif (-not $script:lost) {
+        & (Join-Path $PSScriptRoot 'lock.ps1') -Action release -Owner $Owner -HolderPid $PID -ProjectPath $ProjectPath -LockDir $LockDir | ForEach-Object { Say $_ }
+        if ($LASTEXITCODE -ne 0 -and $script:code -eq 0) { $script:code = 13; $result = 'failed: could not release lock' }
+    }
     if ($watch) { Stop-Job $watch -ErrorAction SilentlyContinue; Receive-Job $watch -ErrorAction SilentlyContinue | ForEach-Object { Say "dialog watch: $_" }; Remove-Job $watch -Force -ErrorAction SilentlyContinue }
     Say ("total " + [int]((Get-Date) - $t0).TotalMinutes + " min")
 }

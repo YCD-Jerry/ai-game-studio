@@ -1,0 +1,61 @@
+.screen {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    background-color: #122025;
+    color: #edf3ed;
+}
+
+.board {
+    max-width: 680px;
+    width: 100%;
+    align-self: center;
+}
+
+.objective {
+    margin-bottom: 14px;
+    font-size: 26px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.tiles {
+    flex-direction: row;
+}
+
+.tile {
+    flex-grow: 1;
+    flex-basis: 0;
+    justify-content: center;
+    min-height: 68px;
+    margin-right: 4px;
+    border-radius: 6px;
+    background-color: #2b4149;
+    -unity-text-align: middle-center;
+}
+
+.last-tile {
+    margin-right: 0;
+}
+
+.tile Label {
+    white-space: normal;
+}
+
+.player-tile {
+    background-color: #ecd48e;
+    color: #142129;
+}
+
+.feedback {
+    margin-top: 12px;
+    min-height: 20px;
+    white-space: normal;
+}
+
+.controls {
+    margin-top: 4px;
+    color: #c0d0cb;
+    white-space: normal;
+}

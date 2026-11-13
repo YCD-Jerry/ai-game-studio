@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEngine.SceneManagement;
 
 namespace Game.EditorTools
@@ -14,12 +15,15 @@ namespace Game.EditorTools
     static class EditorStateBeacon
     {
         static readonly string k_Path = Path.Combine(Directory.GetCurrentDirectory(), "Temp", "editor_state.txt");
+        static readonly int k_Pid = System.Diagnostics.Process.GetCurrentProcess().Id;
         static double s_Next;
 
         static EditorStateBeacon()
         {
             EditorApplication.playModeStateChanged += _ => Write();
+            CompilationPipeline.compilationStarted += _ => Write("reloading");
             AssemblyReloadEvents.beforeAssemblyReload += () => Write("reloading");
+            EditorApplication.quitting += Remove;
             EditorApplication.update += () =>
             {
                 if (EditorApplication.timeSinceStartup < s_Next) return;
@@ -42,7 +46,7 @@ namespace Game.EditorTools
             return $"playing={EditorApplication.isPlaying} willPlay={EditorApplication.isPlayingOrWillChangePlaymode} " +
                    $"compiling={EditorApplication.isCompiling} updating={EditorApplication.isUpdating} " +
                    $"scene={SceneManager.GetActiveScene().path} dirty={dirty} untitled={untitled} " +
-                   $"phase={phase ?? "idle"} utc={DateTime.UtcNow:o}";
+                   $"phase={phase ?? "idle"} utc={DateTime.UtcNow:o} pid={k_Pid}";
         }
 
         static void Write(string phase = null)
@@ -50,10 +54,20 @@ namespace Game.EditorTools
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(k_Path)!);
-                File.WriteAllText(k_Path + ".tmp", Describe(phase));
-                File.Copy(k_Path + ".tmp", k_Path, true);
+                var temporary = k_Path + ".tmp";
+                File.WriteAllText(temporary, Describe(phase));
+                if (File.Exists(k_Path)) File.Replace(temporary, k_Path, null);
+                else File.Move(temporary, k_Path);
             }
-            catch (IOException) { }   // a reader holding the file; the next tick writes again
+            catch (IOException) { s_Next = 0; }   // retry on the next editor update
+            catch (UnauthorizedAccessException) { }   // readers stop trusting the previous sample when it expires
+        }
+
+        static void Remove()
+        {
+            try { File.Delete(k_Path); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
         }
     }
 

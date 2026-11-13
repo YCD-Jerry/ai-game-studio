@@ -121,7 +121,7 @@ PlayerPrefs (IndexedDB on the web) is enough for a story game: settings, unlocke
 
 Sessions inspect the editor through a CLI or MCP (e.g. `unity command script eval_file --file x.cs`, `editor invoke_menu`, `script recompile`, `console get`). Eval files live **outside** the project (writing into `Assets/` triggers an import).
 
-- State probe: `scripts/playing.cs` (run by the guard through the CLI) or `assets/unity/Editor/EditorStateBeacon.cs`, which writes `Temp/editor_state.txt` every 2 s (playing, compiling, active scene, dirty, untitled) for the guard's beacon mode and the write-blocking hook. The beacon also pauses auto-refresh while playing, so files dropped into `Assets/` mid-Play aren't imported until Play ends.
+- State probe: [Editor safety](editor-safety.md) describes the beacon and optional CLI probe, including Play transitions, compilation, import, and recovery. The beacon pauses Unity's automatic refresh during Play.
 - Shots: `assets/unity/Editor/ReviewShots.cs` (named cameras → PNGs; async shader compile off, forced skinning recalculation, Animators sampled, everything restored in `finally`). Log a measured number next to every picture and distrust a picture that disagrees with its number.
 - Data checks as editor menus (face-to-face, interact points reachable, companion width vs model, synthetic walks). Each check restores the scene that was open and saves nothing.
 

@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:Style src="KeyDoor.uss" />
+  <ui:VisualElement class="screen">
+    <ui:VisualElement class="board">
+      <ui:Label name="objective" class="objective" />
+      <ui:VisualElement class="tiles">
+        <ui:VisualElement name="tile0" class="tile"><ui:Label text="Start" /></ui:VisualElement>
+        <ui:VisualElement name="tile1" class="tile"><ui:Label text="Key" /></ui:VisualElement>
+        <ui:VisualElement name="tile2" class="tile" />
+        <ui:VisualElement name="tile3" class="tile"><ui:Label text="Closed door" /></ui:VisualElement>
+        <ui:VisualElement name="tile4" class="tile last-tile"><ui:Label text="Exit" /></ui:VisualElement>
+      </ui:VisualElement>
+      <ui:Label name="feedback" class="feedback" />
+      <ui:Label class="controls" text="Arrow keys · move    F · interact    S · save    R · reload" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>

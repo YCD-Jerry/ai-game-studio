@@ -11,19 +11,21 @@ still says "Responding" and uses no CPU. Two seen in practice:
                           threw. Mode CloseSaveScene sends WM_CLOSE = Cancel: nothing is written. Use by hand when
                           diagnosing a frozen editor, not as a habit (hand_back.cs avoids the dialog in the first place).
 
-  Start-Job -FilePath .\dialog_watch.ps1 -ArgumentList 'TryAgain', 25     # in a round; Stop-Job in finally
-  .\dialog_watch.ps1 -Mode CloseSaveScene -Minutes 0                      # one pass, now
+  .\dialog_watch.ps1 -Mode TryAgain -Minutes 25 -EditorPid <Unity PID>
+  .\dialog_watch.ps1 -Mode CloseSaveScene -Minutes 0 -EditorPid <Unity PID>
   .\dialog_watch.ps1 -Mode List -Minutes 0                                # just list the editor's visible dialogs
 
 Only windows owned by a process named "Unity" are touched. Window titles and button captions are matched in English;
 an editor running in another UI language needs the captions changed (not verified for other languages).
 #>
 param(
-    [ValidateSet('TryAgain', 'CloseSaveScene', 'List')][string]$Mode = 'TryAgain',
+    [ValidateSet('TryAgain', 'CloseSaveScene', 'List')][string]$Mode = 'List',
     [double]$Minutes = 25,
     [int]$MaxClicks = 20,
-    [int]$IntervalSec = 6
+    [int]$IntervalSec = 6,
+    [int]$EditorPid
 )
+if ($Mode -ne 'List' -and $EditorPid -le 0) { throw 'Supply the target Unity Editor PID for dialog actions.' }
 Add-Type @'
 using System; using System.Text; using System.Collections.Generic; using System.Runtime.InteropServices;
 public static class GsDlg {
@@ -54,7 +56,11 @@ public static class GsDlg {
   public static void Close(IntPtr h) { PostMessage(h, 0x0010, IntPtr.Zero, IntPtr.Zero); }
 }
 '@
-function UnityPids { @(Get-Process -Name Unity -ErrorAction SilentlyContinue | ForEach-Object { [uint32]$_.Id }) }
+function UnityPids {
+    Get-Process -Name Unity -ErrorAction SilentlyContinue |
+        Where-Object { -not $EditorPid -or $_.Id -eq $EditorPid } |
+        ForEach-Object { [uint32]$_.Id }
+}
 $until = (Get-Date).AddMinutes($Minutes)
 $clicks = 0
 do {

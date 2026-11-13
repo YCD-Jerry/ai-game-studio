@@ -4,4 +4,4 @@ focus: trace
 weight: 1
 ---
 
-A lock mechanism records an owner and treats old locks as stale (a timeout), so only one session uses the editor at a time.
+A lock mechanism atomically grants access to one session across editor and import operations. It records an owner and treats an old heartbeat as a diagnostic signal. Recovery verifies that the original work has stopped before removing a specific record.

@@ -1,105 +1,81 @@
-# Editor safety: many sessions, one Unity editor, a human playing inside it
+# Shared Unity editor safety
 
-Read this before any recompile, rebuild, reimport, scene open, screenshot eval, or file copy into `Assets/`. The scripts are in `scripts/` (next to `SKILL.md`); the in-project helper is `assets/unity/Editor/EditorStateBeacon.cs`.
+Use this workflow when several sessions can change the same open Unity project or a person is playtesting in it. For automated PlayMode tests and builds, prefer a separate project copy with its own `Library`, test saves, and output. A running editor can continue a command after the client times out.
 
-## Contents
-1. The problem
-2. The pieces
-3. Setup
-4. The guard and its exit codes
-5. The lock
-6. A round, start to finish
-7. Writing evals that clean up after themselves
-8. When the editor seems frozen
-9. Unverified parts of the scripts
+## Install and check
 
-## 1. The problem
+From the skill folder, with the target project closed and Python 3.10 or later:
 
-The editor is one shared, stateful machine with a human inside it. Whatever one session does (recompile, import, rebuild, open a scene, render) changes what everyone else sees. Every incident in the source project came from treating it like a stateless build server:
+```text
+python scripts/setup_unity.py install --project <project> --editor-closed
+python scripts/setup_unity.py doctor --project <project>
+```
 
-- a recompile during the director's Play (twice in one day): NullReferenceExceptions in every Update;
-- a file dropped into `Assets/` mid-Play: the domain reload killed every coroutine and froze the story at its climax;
-- several sessions' queued rebuilds firing together when the editor came back, 13 recovery backups (96 MB), 40 s recompiles, 90 s to enter Play;
-- a job looping "wait until clean" with no timeout while holding the editor for an hour;
-- a builder that threw, an Untitled scene, a "save all", and an invisible native Save dialog freezing the editor for 17 minutes;
-- a character import racing a chapter rebuild and baking an empty animator controller;
-- checks that failed silently and read as passes.
+The installer copies the optional tools and beacon. It reports differing files for review. In an existing installation, update all participating sessions and wrappers together with the editor closed and the old jobs stopped. Older lock records remain blocked until recovered. Add `.game-studio/locks/` to the game's ignore rules. Keep that directory on a local disk, outside synchronized storage, and use the same directory in every cooperating session. Never remove its `coordination.mutex` while clients may be using it.
 
-The answer is four mechanisms: **a guard, a lock, a fixed round shape with a deadline, and evals that clean up after themselves.**
+The current verification covers Windows PowerShell and Git Bash sharing locks, three concurrent contenders, and a live Unity 6000.3.27f1 beacon through Edit and Play. The CLI probe is covered by stub tests. Live CLI bridge combinations, the complete round with editor mutations, and native Linux and macOS runs still need verification.
 
-## 2. The pieces
+Open the project, let import finish, and run `doctor` again. The default beacon needs no CLI. For a project with a working live Unity CLI bridge, set `GAME_STUDIO_PLAY_PROBE=cli` and validate the probe against the actual editor. Set `UNITY_CLI` if the executable is off PATH. Set `GAME_STUDIO_EVAL_CMD` if the bridge registers a different eval command. The Windows `round.ps1` workflow still needs a compatible CLI to execute its editor actions.
 
-| File | What it does |
+## Guard and hook
+
+Set `UNITY_PROJECT_PATH` to the project root and give each worker a distinct `GAME_STUDIO_SESSION` token. Use `GAME_STUDIO_LOCK_DIR` only when all workers share the same override. Use `GAME_STUDIO_PYTHON` when the wrappers need a specific Python executable. Run the guard directly before each copy into `Assets`, package or project settings change, refresh, recompile, scene open, or editor eval. Mutation code that runs inside Unity should also check editor state immediately before its action.
+
+```text
+python tools/game-studio/editor_guard.py guard
+```
+
+`guard.ps1 [owner]` and `bash guard.sh [owner]` use the same implementation.
+Use the direct Python command or Bash if local PowerShell policy blocks scripts.
+
+| Exit | Condition |
 |---|---|
-| `scripts/guard.ps1`, `scripts/guard.sh` | Read-only gate: may this session touch the editor right now? Exit codes below |
-| `scripts/playing.cs` | Eval the guard runs: playing / entering Play, paused, compiling, updating, compile failed, open scenes, dirty |
-| `scripts/lock.ps1`, `scripts/lock.sh` | Take / refresh / release / status of `editor.lock` (or any named lock): atomic create, jitter, read-back, exact owner match, stale takeover with a message |
-| `scripts/round.ps1` | The complete round (§6) with a 25-minute deadline and exit codes 10–14 |
-| `scripts/hand_back.cs` | Saves scenes that have a path one by one (never `SaveOpenScenes`), then opens the light scene named in `.game-studio/hand_back.txt` |
-| `scripts/refresh.cs` | `AssetDatabase.Refresh()` with a Play check |
-| `scripts/review_shots.cs` | Spec-driven edit-mode shots (named cameras or `shot=` lines in `Temp/game-studio/review_shots.txt`), small batches, a flat/cyan sanity check per image |
-| `scripts/dialog_watch.ps1` | Background watcher: clicks "Try Again" on "Opening file failed", closes a stray "Save Scene" dialog (cancel), lists Unity's windows when diagnosing a freeze |
-| `assets/unity/Editor/EditorStateBeacon.cs` | In-project: writes `Temp/editor_state.txt` every 2 s (read by the guard in beacon mode and by the hook), and **pauses auto-refresh while playing**, so files that land in `Assets/` mid-Play wait until Play ends |
-| `scripts/hooks/block_assets_while_playing.py` + `settings.example.json` | A Claude Code PreToolUse hook that refuses any write into `Assets/` while the beacon says Play; a permission allow-list for the guard, lock and CLI so sessions aren't stopped by prompts |
+| 0 | Idle Edit mode and cooperative locks are available to this session |
+| 3 | Playing or entering Play |
+| 4 | State unavailable, expired, malformed, ambiguous or timed out |
+| 5 | Another session holds the import lock |
+| 6 | Another session holds the editor lock |
+| 7 | Compiling, importing, or reloading |
 
-## 3. Setup
+Every nonzero result stops the pending editor mutation. The beacon publishes state at Play transitions and every two seconds. A sample older than ten seconds is unknown. The guard is a point-in-time check. A user can start Play between the check and the action. Coordinate the edit window, and use an isolated project for work that needs a guarantee against that race.
 
-0. **How sessions reach the editor.** The scripts assume a command-line bridge into the running editor: the Unity CLI (`unity`) plus its editor package in the project, which lets a shell run `unity command <group> <cmd>` (run a C# snippet, recompile, invoke a menu item, read the console) against the open editor. An MCP bridge to the editor does the same jobs from inside Claude; then run the guard in **beacon mode** (`GAME_STUDIO_PLAY_PROBE=beacon`), which needs no CLI at all. Check your command names once (`unity command --help`); they changed between versions, so set `GAME_STUDIO_EVAL_CMD` if yours isn't `command script eval_file`.
-1. Copy `scripts/` into the project as `tools/game-studio/` (outside `Assets/`). Environment for every session: `UNITY_PROJECT_PATH=<project root>`, `GAME_STUDIO_SESSION=<one ASCII token, e.g. ch3>`. Optional: `GAME_STUDIO_LOCK_DIR` (default `<project>/.game-studio/locks`, on a local disk), `GAME_STUDIO_EVAL_DIR` (where `playing.cs` etc. live; it must be readable by the Unity process, not a sandboxed temp folder), `UNITY_CLI`, `GAME_STUDIO_PLAY_PROBE` (`cli` or `beacon`), `GAME_STUDIO_EVAL_CMD`.
-   On Windows, run the `.ps1` scripts as `powershell -NoProfile -ExecutionPolicy Bypass -File ...` (process scope only; it changes no system setting), or use the bash twins from Git Bash.
-2. Add `.game-studio/locks/` to `.gitignore`; commit `.game-studio/hand_back.txt` naming the light scene.
-3. Copy `EditorStateBeacon.cs` into an Editor folder.
-4. In Unity's preferences, set script changes while playing to "recompile after finished playing".
-5. Decide who may start the editor (one cheap custodian session). Everyone else reports a closed editor instead of opening their own. On "restore scene backup?", choose don't restore: scenes are generated from code.
-6. Install the hard stop and the allow-list: merge `scripts/hooks/settings.example.json` into `.claude/settings.json` (adjust the paths) and restart the sessions. Now even a session that forgot every rule cannot write into `Assets/` while the director plays.
-7. The custodian opens the editor (`unity open <project>` or the Hub) once, waits for the import to finish, and opens the light scene.
+The optional Claude Code hook in `scripts/hooks/settings.example.json` applies to the host's matched tool calls. It checks direct edits of `Assets`, `Packages`, and `ProjectSettings`. It gates shell commands unless they match a small read-only allowlist, because shell programs can write through relative paths and subprocesses. Missing state blocks gated calls, including with the editor closed. Work outside the configured project or use a separate checkout for offline changes. Merge the example manually only where this policy fits. Tools outside the host's matcher, external processes and other editors can still change the project. The hook adds no tool permissions. Unity's beacon also delays automatic refresh in Play. Explicit Unity operations still need their own state check.
 
-## 4. The guard and its exit codes
+## Lock, heartbeat and recovery
 
-```powershell
-& scripts/guard.ps1 ch3; if ($LASTEXITCODE -ne 0) { return }
-```
-```bash
-scripts/guard.sh ch3 || exit
+Acquire the cooperative lock before any shared editor or global import operation. Use either `editor` or `import` according to the operation. Both lock names participate in the same acquisition transaction and cannot overlap. Status is available while another worker owns the lock.
+
+```text
+python tools/game-studio/editor_lock.py take --owner chapter-3 --wait-minutes 2 --note "Rebuild scene"
+python tools/game-studio/editor_lock.py refresh --owner chapter-3
+python tools/game-studio/editor_lock.py release --owner chapter-3
+python tools/game-studio/editor_lock.py status
 ```
 
-| Code | Meaning | Do |
-|---|---|---|
-| 0 | Not playing, no import running, editor lock free or yours | Proceed |
-| 3 | Play mode or entering it: the director is playtesting | Do other work; come back later. Never stop the director's Play yourself; if a rebuild is urgent, ask them |
-| 4 | State unknown: editor closed, CLI failed, eval timed out, modal dialog | Look before retrying (§8) |
-| 5 | Import lock younger than 30 min: a global import is running | Wait |
-| 6 | Another owner's editor lock younger than 20 min | Wait your turn |
+The PowerShell and Bash lock wrappers preserve the familiar take, refresh, release, and status commands. Refresh between bounded steps. For automated rounds, pass `--holder-pid` with the same long-lived local worker PID to take, refresh, and release, or let `round.ps1` do it. A heartbeat older than the configured diagnostic threshold (20 minutes for editor, 30 for import) prompts inspection. Age alone never releases a lock. A stopped client can leave work queued in Unity.
 
-Run it before every recompile, rebuild, reimport, `AssetDatabase.Refresh`, and **every copy into `Assets/`**. The rule protects a state ("the project does not change while the director plays"), not one action; written as "don't recompile", it let a texture drop through.
+If a job crashed or a legacy lock remains, inspect its status and the Unity console. Verify no relevant job is running or queued. Use the record fingerprint printed by status to recover that exact version under the same OS mutex:
 
-## 5. The lock
-
-```powershell
-& scripts/lock.ps1 -Action take -Name editor -Note "ch3 rebuild"   # bounded wait, then 0 or 1
-& scripts/lock.ps1 -Action refresh -Name editor                      # before each long step; 1 = you lost it
-& scripts/lock.ps1 -Action release -Name editor                      # only releases your own
+```text
+python tools/game-studio/editor_lock.py recover --name editor --fingerprint <value> --confirm-no-work
 ```
 
-- A lock not rewritten for 20 minutes is stale and may be taken over; so refresh it between steps (a 40-minute sequence once lost the editor halfway).
-- Never wait while holding it. Wait first (bounded), then take, then work.
-- Global operations that regenerate shared assets (importing all characters) use their own lock name (`import`) so the guard returns 5 to everyone else.
-- Owner names are matched exactly (a prefix match once let `ch1` pass a lock held by `ch10`).
+Recovery checks the recorded PID when present and refuses an alive or indeterminate PID. It also requires idle Edit mode. For a verified closed project, add `--editor-closed`; the command refuses evidence of an open editor. For a record with no PID, confirm that its owner has stopped before recovering. If the fingerprint changed, inspect again. A PID can be reused. Recovery treats a reused live PID conservatively, so confirm the original process is gone before planning how to clear the lock.
 
-## 6. A round, start to finish
+## A bounded round
 
 `scripts/round.ps1` does all of this; read it before writing your own.
 
 ```
-wait for the lock (bounded, holding nothing) → take it, read it back
-deadline = now + 25 min; start dialog_watch
+wait for the lock (bounded, holding nothing) → acquire it
+deadline = now + 25 min; opt in to dialog_watch only with the target editor PID
 bring in: refresh lock → guard → copy only changed files (top level of -StageDir only; retry 6×) → mirror deletes with .meta
 refresh → settle: compiling=False and updating=False three polls in a row
 compile failed? → list `error CS` from the console → STOP (never rebuild on old code)
 build: refresh lock → guard → t = now → invoke the builder menu → settle
        → VERIFY the builder's "Built" line or the scene file written after t (the menu reply lies)
 shots: refresh lock → write the spec → review_shots (small batch) → VERIFY PNG count and times > t
-finally: hand_back (save named scenes, open the light scene) → release the lock if still yours → stop the watcher
+finally: check guard → hand back when safe → release on known completion; retain lock after uncertain CLI failure
 ```
 
 Exit codes: 0 done; 1 no lock; 2 bad arguments or missing proof; 3 guard refused mid-round; 10 compile errors; 11 build not verified; 12 shots failed; 13 deadline or lost lock; 14 never settled.
@@ -110,7 +86,7 @@ Rules around it:
 - A stopped background shell script can keep running. After stopping a job, check its output, the lock and file times before reporting it stopped. Queued jobs check a "still wanted?" marker right after taking the lock.
 - Background jobs are checked often enough to notice a dead editor.
 
-## 7. Writing evals that clean up after themselves
+## Writing evals that clean up after themselves
 
 - An eval file is a C# statement body ending in `return "<string>";`, kept **outside** `Assets/`. No arguments: parameters go in a side file the eval reads. Fully qualify names.
 - Any eval that changes something starts with `if (UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) return "skipped: playing";` (this also catches the moment Play is starting).
@@ -119,16 +95,11 @@ Rules around it:
 - Shots: async shader compilation off (flat cyan = still compiling); `forceMatrixRecalculationPerRender` on skinned meshes; sample Animators (`Rebind(); Update(t)`) or people stand in T-pose; one reused RenderTexture; wait for the GPU with a one-pixel `ReadPixels` (a looped `AsyncGPUReadback` crashed the editor); a few images per eval. Log a measured number beside each picture.
 - Never `SaveOpenScenes` (an Untitled scene turns it into a modal dialog). Save scenes with a path, one by one.
 - Never swap a scene file on disk while it is open (git checkout, copy): a modal "changed externally" dialog blocks everyone. Hand back first, then restore, then refresh.
-- Copying over a model the editor has memory-mapped can fail (Win32 error 1224) and pop "Opening file failed"; copy only changed files, retry, and keep `dialog_watch` running.
+- Copying over a model the editor has memory-mapped can fail (Win32 error 1224) and pop "Opening file failed". Copy only changed files and use bounded retries. The optional Windows watcher can retry the dialog for a specific editor PID.
 
-## 8. When the editor seems frozen
+## When the editor seems frozen
 
 Symptoms: every eval times out, the process shows "Responding" at ~0% CPU. Almost always a modal dialog.
 1. `scripts/dialog_watch.ps1 -Mode List` to see Unity's windows; a `#32770` class window is a native dialog.
-2. "Save Scene" → close it (WM_CLOSE = cancel, writes nothing). "Opening file failed" → Try Again.
-3. If the permission system won't let you act on the process, don't work around it: put it first in the director's decisions file.
-4. Afterwards: find who left the Untitled scene or the locked file, and fix the cause.
-
-## 9. Unverified parts of the scripts
-
-Tested against a stub CLI and a fake project (all guard and lock exit codes, stale locks, BOM/CRLF lock files, two takers at once, round success and failure paths); C# evals compile against Unity 6000.3. Not yet verified against a live editor: the eval wrapper's handling of `using` and non-string returns; `review_shots.cs` rendering inactive cameras under URP and its flat/cyan thresholds; `OpenScene(Single)` dropping dirty generated scenes without a dialog; `isPlayingOrWillChangePlaymode` during a real Play transition; `dialog_watch.ps1` against non-English editor dialogs; the bash scripts on macOS/Linux. Treat the first live run as a test and read every output.
+2. Check which editor owns the dialog and inspect the pending work. The optional watcher matches English captions and requires the target editor PID for actions.
+3. Trace the dialog to the builder, save, or import operation that left it open.

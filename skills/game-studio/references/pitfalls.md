@@ -84,7 +84,7 @@ Historical incidents and responses from The Yellow Brick Road. Use them to diagn
 
 **35. "It will carry on after the restart."** The director closes the app often (battery, network). → Background commands, watchers and scheduled checks die with the app; batch builds die with the machine; a half-done build leaves changed files in the build checkout. → A restart checklist in `RECOVERY.md`:
 - Push unpushed commits.
-- Clear stale locks only after checking the editor.
+- Use [lock recovery](editor-safety.md#lock-heartbeat-and-recovery) after confirming that the original worker and any queued Unity job have stopped.
 - Check the build checkout.
 - Rerun every job from the start.
 - Re-dispatch work from the session list.

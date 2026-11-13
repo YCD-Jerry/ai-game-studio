@@ -1,4 +1,4 @@
-# Production loop: from a story to chapters the director signs off
+# Storybook production example: from story to playable chapter
 
 Read this when planning the game, starting a chapter, running look passes, handling playtest feedback, or leaving the team to work overnight. Templates: `templates/PRD.md`, `templates/chapter.md`, `templates/backlog.md`, `templates/morning-report.md`, `templates/night-plan.md`.
 
